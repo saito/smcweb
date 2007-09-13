@@ -1,6 +1,6 @@
 #! /bin/sh                                                                            
 
-PORT=3010
+PORT=3030
 DIR=`dirname $0`/../..
 
 case "$1" in
