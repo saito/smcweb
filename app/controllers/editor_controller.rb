@@ -37,6 +37,9 @@ class EditorController < ApplicationController
       io << yaml
     end
     
+    runner = SmallCage::Runner.new({:path => target })
+    runner.update
+    
     render :action => :index
   end
 
