@@ -7,6 +7,7 @@ class EditorController < ApplicationController
   require 'pp'
   require 'smallcage'
   
+
   def index
     @files = get_files
     @fields = get_fields
@@ -30,7 +31,7 @@ class EditorController < ApplicationController
     end
     
     yaml = @form.to_yaml
-    
+
     target = get_target_file
     File.open(target, "w") do |io|
       io << yaml
