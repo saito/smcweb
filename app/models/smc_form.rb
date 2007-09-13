@@ -1,5 +1,5 @@
 class SmcForm
-  require 'yaml/encoding'
+  # require 'yaml/encoding'
 
   def initialize(fields, params = nil)
     @fields = fields
@@ -37,8 +37,7 @@ class SmcForm
       docs << @params["body"]
     end
     
-    yaml = YAML.dump(hash)
-    yaml = yaml.gsub(/\\x([0-9A-F]{2})/){ [$1].pack('H*') } # for YAML bug
+    yaml = hash.to_yaml
     yaml = yaml.gsub(/^--- \n/, "")
 
     yaml += "--- |\n"
