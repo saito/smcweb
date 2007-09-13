@@ -2,7 +2,7 @@
 <ul>
 <li><%= link_to "Create new file", :controller => :editor, :action => :index %></a></li>
 <%- @files.reverse.each do |f| -%>
-<li><%= link_to f.basename, :controller => :editor, :action => :index, :__target => f.basename %></li>
+<li><%= link_to f.basename, :controller => :editor, :action => :index, :target => f.basename %></li>
 <%- end -%>
 </ul>
 </div>
@@ -17,7 +17,7 @@
 <table>
 <tr>
 <td>File</td>
-<td><%= text_field_tag "__target", @__target, :size=>60 %></td>
+<td><%= text_field_tag "target", @target, :size=>60 %></td>
 </tr>
 
 <%- 
@@ -30,10 +30,10 @@
 <td>
 
 <%- if f.typ == "text" -%>
-<%= text_field "form", f.name, f.options.nil? ? {:size => 60 } : f.options %>
+<%= text_field "form", "field_" + f.name, f.options.nil? ? {:size => 60 } : f.options %>
 <%- elsif f.typ == "textarea" -%>
 
-<%= text_area "form", f.name, f.options.nil? ? {:size => "60x20"} : f.options %>
+<%= text_area "form", "field_" + f.name, f.options.nil? ? {:size => "60x20"} : f.options %>
 <%- end -%>
 </td>
 </tr>

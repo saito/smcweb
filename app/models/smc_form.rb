@@ -1,10 +1,17 @@
 class SmcForm
+  require 'yaml/encoding'
+
   def initialize(fields, params = nil)
     @fields = fields
     if params.nil? 
       @params = default_values
     else
-      @params = params.reject{|k,v| fields[k].nil? }
+      params = params.reject{|k,v| k !~ /^field_(.+)$/ || fields[$1].nil? }
+      @params = {}
+      params.each do |k,v|
+        k = k.gsub(/^field_/, "")
+        @params[k] = v
+      end
     end
   end
   
@@ -17,14 +24,38 @@ class SmcForm
   end
   private :default_values
   
+  def to_yaml
+    docs = []
+    hash = {}
+    
+    @params.keys.each do |k|
+      next if k == "body"
+      hash[k] = @params[k]
+    end
+    docs << hash
+    unless @params["body"].nil?
+      docs << @params["body"]
+    end
+    
+    yaml = YAML.dump(hash)
+    yaml = yaml.gsub(/\\x([0-9A-F]{2})/){ [$1].pack('H*') } # for YAML bug
+    yaml = yaml.gsub(/^--- \n/, "")
+
+    yaml += "--- |\n"
+    yaml += @params["body"]
+    return yaml
+  end
   
   def method_missing(name, *args)
+    unless name.to_s =~ /^field_(.+)$/
+      raise NameError.new("undefined method `#{name}' for SmcForm")
+    end
+  
+    field_name = $1
     setter = false
-    if name =~ /=$/
-      field_name = name[0...-1]
+    if field_name =~ /=$/
+      field_name = field_name[0...-1]
       setter = true
-    else
-      field_name = name
     end
   
     if @fields[field_name.to_s].nil?

@@ -16,16 +16,24 @@ class EditorController < ApplicationController
     if target.nil?
       target = relpath(new_target_file)
     end
-    @__target = target
+    @target = target
   end
   
   def save
     @files = get_files
     @fields = get_fields
     @form = SmcForm.new(@fields, params["form"])
-    @__target = params["__target"]
-    unless valid_file_name?(@__target)
+    @target = params["target"]
+
+    unless valid_file_name?(@target)
       raise "invalid target file name."
+    end
+    
+    yaml = @form.to_yaml
+    
+    target = get_target_file
+    File.open(target, "w") do |io|
+      io << yaml
     end
     
     render :action => :index
@@ -40,7 +48,7 @@ private
   end
 
   def get_target_file
-    name = params["__target"]
+    name = params["target"]
     return nil if name.nil?
     return nil unless valid_file_name?(name)
     return config["source_dir"].join(name)
@@ -51,7 +59,7 @@ private
     if target_file.nil? || ! target_file.file?
       target_file = @files[0]
       new_file = true
-    else      
+    else
       new_file = false
     end
     
