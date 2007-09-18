@@ -1,4 +1,4 @@
-<div class="sidebar">
+<div id="sidebar">
 <ul>
 <li><%= link_to "Create new file", :controller => :editor, :action => :index %></a></li>
 <%- @files.reverse.each do |f| -%>
@@ -7,8 +7,9 @@
 </ul>
 </div>
 
-<div class="main">
-<div class="description">
+<div id="main">
+<div id="container">
+<div id="description">
 <%= @config["description"] %>
 </div>
 
@@ -47,5 +48,5 @@
 </tr>
 
 </table>
-
+</div>
 </div>
