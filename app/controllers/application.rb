@@ -5,6 +5,8 @@ class ApplicationController < ActionController::Base
   # Pick a unique cookie name to distinguish our session data from others'
   session :off
   
+private  
+
   def read_config_filter
     @config = read_env_config
     if @config.nil?
@@ -23,7 +25,33 @@ class ApplicationController < ActionController::Base
     return path.relative_path_from(config["source_dir"])
   end
 
-private  
+  def load_yaml_as_hash(file)
+    docs = YAML.load_stream(File.read(file)).documents
+
+    result = {}
+    string_count = 0
+    arrays_count = 0
+    docs.each do |doc|
+      if doc.is_a? String
+        if string_count == 0
+          result["body"] = doc
+        else
+          result["strings_#{string_count}"] = doc
+        end
+        string_count += 1
+      elsif doc.is_a? Array
+        result["arrays_#{arrays_count}"] = doc
+        arrays_count += 1
+      elsif doc.is_a? Hash
+        doc.keys.each do |k|
+          next if k == "strings" || k == "arrays"
+          result[k] = doc[k]
+        end
+      end
+    end
+    
+    return result    
+  end
 
   def read_config(site, type)
     return nil unless site =~ /^[-\w]+$/
@@ -40,7 +68,9 @@ private
     type_config_path = type_dir.join("#{type}.yml")
     return nil unless type_config_path.file?
     
-    type_config = YAML.load(ERB.new(type_config_path.read).result(binding))
+    docs = YAML.load_stream(ERB.new(type_config_path.read).result(binding)).documents
+    type_config = docs[0]
+    description = docs[1]
 
     config = type_config.merge(site_config)
 
@@ -51,6 +81,7 @@ private
     config["source_dir"] = root.join("." + config["path"])
     config["label"] = type.capitalize if config["label"].nil?
     config["file_in"] = Regexp.new(config["file_in"])
+    config["description"] = description
     
     return config
   end

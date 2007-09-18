@@ -8,10 +8,14 @@
 </div>
 
 <div class="main">
+<div class="description">
+<%= @config["description"] %>
+</div>
+
 <form method="post" action="<%= @config["uri_prefix"] %>/editor/save">
-<%- @fields.values.each do |f| -%>
+<%- @fields.each do |f| -%>
 <%- if f.typ == "hidden" -%>
-<%= hidden_field "form", f.name, :value => f.value %>
+<%= hidden_field "form", "field_" + f.name %>
 <%- end -%>
 <%- end -%>
 <table>
@@ -21,8 +25,7 @@
 </tr>
 
 <%- 
-@fields.ordered_keys.each do |k|
-    f = @fields[k]
+@fields.each do |f|
     next if f.typ == "hidden"
 -%>
 <tr>

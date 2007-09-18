@@ -1,47 +1,53 @@
 class SmcForm
   # require 'yaml/encoding'
 
-  def initialize(fields, params = nil)
+  def initialize(fields)
     @fields = fields
-    if params.nil? 
-      @params = default_values
-    else
-      params = params.reject{|k,v| k !~ /^field_(.+)$/ || fields[$1].nil? }
-      @params = {}
-      params.each do |k,v|
-        k = k.gsub(/^field_/, "")
-        @params[k] = v
-      end
+    @field_names = @fields.map {|f| f.name }
+    @values = {}
+  end
+  
+  def params=(params)
+    @values = {}
+    params.each do |k,v|
+      next if k !~ /^field_(.+)$/ || ! @field_names.include?($1)
+      k = $1
+      @values[k] = v
     end
   end
   
-  def default_values
-    result = {}
-    @fields.keys.each do |k|
-        result[k] = @fields[k].value unless @fields[k].value.nil?
-    end
-    return result
+  def values=(values)
+    @values = values
   end
-  private :default_values
   
   def to_yaml
-    docs = []
     hash = {}
+    strings = []
+    arrays = []
     
-    @params.keys.each do |k|
-      next if k == "body"
-      hash[k] = @params[k]
-    end
-    docs << hash
-    unless @params["body"].nil?
-      docs << @params["body"]
+    @values.keys.each do |k|
+      if k == "body"
+        strings[0] = @values[k]
+      elsif k =~ /^strings_(\d+)$/
+        strings[$1.to_i] = @values[k]
+      elsif k =~ /^arrays_(\d+)$/
+        arrays[$1.to_i] = @values[k]
+      else
+        hash[k] = @values[k]
+      end
     end
     
     yaml = hash.to_yaml
     yaml = yaml.gsub(/^--- \n/, "")
 
-    yaml += "--- |\n"
-    yaml += @params["body"]
+    strings.each do |str|
+      yaml += "--- |\n"
+      yaml += str
+      if str !~ /\n$/
+        yaml += "\n"
+      end
+    end
+
     return yaml
   end
   
@@ -56,15 +62,12 @@ class SmcForm
       field_name = field_name[0...-1]
       setter = true
     end
-  
-    if @fields[field_name.to_s].nil?
-      return nil
-    end
+    return nil unless @field_names.include? field_name
     
     if setter
-      return @params[field_name.to_s] = args[0]
+      return @values[field_name.to_s] = args[0]
     else
-      return @params[field_name.to_s]
+      return @values[field_name.to_s]
     end
   end
 end
