@@ -1,0 +1,22 @@
+#sidebar{ 
+  width: 200px;
+  float: left;
+}
+
+#main{
+  margin-left: 200px;
+  background: #fff;
+}
+
+#container {
+  width: 600px;
+  margin: 30px auto 0 auto;
+  text-align: left;
+  font-size: 0.8em;
+}
+
+#description {
+  background: #EEE;
+  padding: 0.8em;
+  margin-bottom: 2em;
+}
