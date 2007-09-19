@@ -9,6 +9,7 @@
 
 <div id="main">
 <div id="container">
+
 <div id="description">
 <%= @config["description"] %>
 </div>
@@ -44,9 +45,22 @@
 <%- end -%>
 
 <tr>
-<td colspan="2"><input type="submit" value="Save" /></td>
+<td colspan="2">
+<%= submit_tag %>
+</td>
 </tr>
 
 </table>
+
+</form>
+<form method="post" action="<%= @config["uri_prefix"] %>/editor/delete">
+<ul>
+<li><%=h @target %></li>
+</ul>
+<%= hidden_field_tag "target", @target %>
+<input type="submit" value="Delete this file" onClick="return confirm('Are you sure DELETE this file?')" />
+</form>
+
+
 </div>
 </div>

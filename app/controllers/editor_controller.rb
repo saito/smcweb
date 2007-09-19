@@ -18,9 +18,17 @@ class EditorController < ApplicationController
       target = relpath(new_target_file)
     end
     @target = target
+    render :action => :index
   end
   
   def delete
+    f = get_target_file(true)
+    unless f.nil?
+      exec_delete(f)
+      publish(nil)
+    end
+    params["target"] = nil
+    index    
   end
   
   def save
@@ -80,10 +88,20 @@ private
   end
 
   def exec_publish(target_file)
+    return if target_file.nil?
     runner = SmallCage::Runner.new({:path => target_file })
     runner.update
   end
 
+
+  def exec_delete(file)
+    File.delete(file)
+    
+    if file.to_s =~ /.smc/
+      out_file = file.to_s[0...-4]
+      File.delete(out_file)
+    end
+  end
 
   def init_fields
     if ! form_config.nil?
