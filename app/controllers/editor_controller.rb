@@ -20,6 +20,9 @@ class EditorController < ApplicationController
     @target = target
   end
   
+  def delete
+  end
+  
   def save
     @files = get_files
 
@@ -45,10 +48,42 @@ class EditorController < ApplicationController
   
 private  
 
-  def publish(target)
-    runner = SmallCage::Runner.new({:path => target })
+  def publish(target_file)
+    path = @config["publish"]
+    if path.nil?
+      exec_publish(target_file)
+    else
+      publish_config_path(path, target_file)
+    end
+  end
+  
+  def publish_config_path(path, target_file)
+    if path.is_a?(Array)
+      path.each do |p|
+        publish_config_path(p, target_file)
+      end
+      return
+    elsif path == :self
+      exec_publish(target_file)
+      return
+    end
+    
+    unless path.is_a?(String)
+      raise "Path is not a String:" + path.to_s
+    end
+
+    raise "Illegal publish path:" + path unless path[0] == ?/ || path =~ %r{/\.\./}
+    file = @config["root"].join("." + path)
+    raise "Illegal publish path:" + path unless file.exist?
+    
+    exec_publish(file)
+  end
+
+  def exec_publish(target_file)
+    runner = SmallCage::Runner.new({:path => target_file })
     runner.update
-  end    
+  end
+
 
   def init_fields
     if ! form_config.nil?
