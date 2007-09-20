@@ -19,9 +19,9 @@ tinyMCE.init({
 
 <div id="sidebar">
 <ul>
-<li><%= link_to "Create new file", :controller => :editor, :action => :index %></li>
+<li><a href="<%= @config["uri_prefix"] %>/editor/index">Create new file</a></li>
 <%- @files.reverse.each do |f| -%>
-<li><%= link_to f.basename, :controller => :editor, :action => :index, :target => f.basename %></li>
+<li><a href="<%= @config["uri_prefix"] %>/editor/index?target=<%=h f.basename %>"><%=h f.basename %></a></li>
 <%- end -%>
 </ul>
 </div>
