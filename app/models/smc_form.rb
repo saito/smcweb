@@ -15,7 +15,7 @@ class SmcForm
     params.each do |k,v|
       next if k !~ /^field_(.+)$/ || ! @fields_hash.key?($1)
       k = $1
-      if @fields[k].type == "array"
+      if @fields_hash[k].typ == "array"
         @values[k] = v.split(/\r\n|\r|\n/)
       else
         @values[k] = v
@@ -79,10 +79,24 @@ class SmcForm
     end
     return nil unless @fields_hash.key?(field_name)
     
+    field = @fields_hash[field_name]
     if setter
-      return @values[field_name.to_s] = args[0]
+      v = args[0]
+      if v.nil?
+        return @values[field_name] = nil
+      end
+      if field.typ == "array"
+        return @values[field_name] = v.split(/\r\n|\r|\n/)
+      else
+        return @values[field_name] = v
+      end
     else
-      return @values[field_name.to_s]
+      if field.typ == "array"
+        return nil if @values[field_name].nil?
+        return @values[field_name].join("\n")
+      else
+        return @values[field_name]
+      end
     end
   end
 end
