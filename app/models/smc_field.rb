@@ -16,7 +16,7 @@ class SmcField
       if k == "body" || k =~ /^strings_\d+$/
         result << SmcField.new(k, "text")
       elsif k =~ /^arrays_\d+$/
-        result << SmcField.new(k, "text")
+        result << SmcField.new(k, "array")
       else
         result << SmcField.new(k, "text")
       end

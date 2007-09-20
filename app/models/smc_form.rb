@@ -3,16 +3,23 @@ class SmcForm
 
   def initialize(fields)
     @fields = fields
-    @field_names = @fields.map {|f| f.name }
+    @fields_hash = {}
+    @fields.each do |f|
+      @fields_hash[f.name] = f
+    end
     @values = {}
   end
   
   def params=(params)
     @values = {}
     params.each do |k,v|
-      next if k !~ /^field_(.+)$/ || ! @field_names.include?($1)
+      next if k !~ /^field_(.+)$/ || ! @fields_hash.key?($1)
       k = $1
-      @values[k] = v
+      if @fields[k].type == "array"
+        @values[k] = v.split(/\r\n|\r|\n/)
+      else
+        @values[k] = v
+      end
     end
   end
   
@@ -48,6 +55,14 @@ class SmcForm
       end
     end
 
+    arrays.each do |arr|
+      yaml += "--- |\n"
+      
+      tmp = arr.to_yaml
+      tmp = tmp.gsub(/^--- \n/, "")
+      yaml += tmp
+    end
+
     return yaml
   end
   
@@ -62,7 +77,7 @@ class SmcForm
       field_name = field_name[0...-1]
       setter = true
     end
-    return nil unless @field_names.include? field_name
+    return nil unless @fields_hash.key?(field_name)
     
     if setter
       return @values[field_name.to_s] = args[0]

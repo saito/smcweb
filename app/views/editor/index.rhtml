@@ -1,7 +1,10 @@
 <script language="javascript" type="text/javascript" src="<%= @config["static_prefix"] %>/js/tiny_mce/tiny_mce.js"></script>
 <script language="javascript" type="text/javascript">
+<%- @fields.each do |f| -%>
+<%- if f.typ == "tinymce" -%>
 tinyMCE.init({
 	mode : "textareas",
+	editor_selector : "tinymce_<%= f.name %>",
     content_css : "<%= @config["static_prefix"] %>/css/tiny_mce.css",
     theme : "advanced",
     theme_advanced_resizing : true,
@@ -9,13 +12,14 @@ tinyMCE.init({
     theme_advanced_toolbar_location : "top",
 	theme_advanced_toolbar_align : "left",
 	theme_advanced_statusbar_location : "bottom"
-    
 });
+<%- end -%>
+<%- end -%>
 </script>
 
 <div id="sidebar">
 <ul>
-<li><%= link_to "Create new file", :controller => :editor, :action => :index %></a></li>
+<li><%= link_to "Create new file", :controller => :editor, :action => :index %></li>
 <%- @files.reverse.each do |f| -%>
 <li><%= link_to f.basename, :controller => :editor, :action => :index, :target => f.basename %></li>
 <%- end -%>
@@ -52,7 +56,10 @@ tinyMCE.init({
 <%- if f.typ == "text" -%>
 <%= text_field "form", "field_" + f.name, f.options.nil? ? {:size => 60 } : f.options %>
 <%- elsif f.typ == "textarea" -%>
-
+<%= text_area "form", "field_" + f.name, f.options.nil? ? {:size => "60x20"} : f.options %>
+<%- elsif f.typ == "tinymce" -%>
+<%= text_area "form", "field_" + f.name, (f.options.nil? ? {:size => "60x20"} : f.options.dup).merge({:class => "tinymce_#{f.name}"}) %>
+<%- elsif f.typ == "array" -%>
 <%= text_area "form", "field_" + f.name, f.options.nil? ? {:size => "60x20"} : f.options %>
 <%- end -%>
 </td>
