@@ -51,6 +51,7 @@ class EditorController < ApplicationController
     
     publish(target_file)
 
+    @files = get_files
     render :action => :index
   end
   
