@@ -9,18 +9,37 @@ class EditorController < ApplicationController
 
   def index
     @files = get_files
+    @target_file = get_target_file(true)
+    @target_file ||= new_target_file
+    @target = relpath(@target_file)
     
     init_fields
     init_form
-    
-    target = relpath(get_target_file(true))
-    if target.nil?
-      target = relpath(new_target_file)
-    end
-    @target = target
     render :action => :index
   end
   
+  def save
+    @files = get_files
+    @target_file = get_target_file(false)
+    if @target_file.nil?
+      render :text => "ERROR: Illegal file name."
+    end
+    @target = relpath(@target_file)
+    
+    init_fields
+    init_form(params)
+
+    yaml = @form.to_yaml
+    File.open(@target_file, "w") do |io|
+      io << yaml
+    end
+    
+    publish(@target_file)
+
+    @files = get_files
+    render :action => :index
+  end
+
   def delete
     f = get_target_file(true)
     unless f.nil?
@@ -31,29 +50,6 @@ class EditorController < ApplicationController
     index    
   end
   
-  def save
-    @files = get_files
-
-    init_fields
-    init_form(params)
-
-    @target = params["target"]
-    unless valid_file_name?(@target)
-      raise "invalid target file name."
-    end
-    
-    yaml = @form.to_yaml
-
-    target_file = get_target_file
-    File.open(target_file, "w") do |io|
-      io << yaml
-    end
-    
-    publish(target_file)
-
-    @files = get_files
-    render :action => :index
-  end
   
 private  
 
@@ -135,11 +131,22 @@ private
     end
   end
 
-  # XXX 同じファイル名が存在した場合の処理が未定。
   def new_target_file
+    @filename_retry = 0
     filename_template = Pathname.new(config["config_dir"]).join("filenames/" + config["file_out"] + ".rhtml")
-    name = ERB.new(filename_template.read).result(binding)
-    return config["source_dir"].join(name)
+    erb = ERB.new(filename_template.read)
+    return format_new_target_file(erb)
+  end  
+
+  def format_new_target_file(erb)
+    name = erb.result(binding)
+    target = config["source_dir"].join(name)
+    return target unless target.exist?
+    @filename_retry += 1
+    if ! config["filename_retry"].nil? || config["filename_retry"].to_i < @filename_retry
+      return target
+    end
+    return format_new_target_file(erb)
   end
 
   def get_target_file(only_exists = false)
@@ -147,7 +154,9 @@ private
     return nil if name.nil?
     return nil unless valid_file_name?(name)
     result = config["source_dir"].join(name)
-    if only_exists
+    if result.exist? && ! result.file?
+      raise "Target already exists, but not a file.: " + name
+    elsif only_exists
       return nil unless result.file?
     end
     return result
@@ -155,10 +164,8 @@ private
   
   def target_obj
     if @target_obj.nil?
-      return nil if params["target"].nil?
-      target_file = get_target_file
-      return nil if target_file.nil?
-      @target_obj = load_yaml_as_hash(target_file)
+      return nil unless @target_file.exist?
+      @target_obj = load_yaml_as_hash(@target_file)
     end
     return @target_obj
   end
@@ -181,6 +188,7 @@ private
 
   def load_form_config
     name = config["form"]
+    return nil if name.nil?
     file = Pathname.new(config["config_dir"]).join("forms/" + name + ".yml")
     raise "form config file not exists: " + file.to_s unless file.file?
    
