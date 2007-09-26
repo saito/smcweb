@@ -14,7 +14,7 @@ class SmcField
     result = []
     sample.keys.each do |k|
       if k == "body" || k =~ /^strings_\d+$/
-        result << SmcField.new(k, "text")
+        result << SmcField.new(k, "textarea")
       elsif k =~ /^arrays_\d+$/
         result << SmcField.new(k, "array")
       else
