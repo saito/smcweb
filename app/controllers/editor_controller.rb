@@ -133,7 +133,7 @@ private
 
   def new_target_file
     @filename_retry = 0
-    filename_template = Pathname.new(config["config_dir"]).join("filenames/" + config["file_out"] + ".rhtml")
+    filename_template = Pathname.new(config["config_dir"]).join("filenames/" + config["filename_out"] + ".rhtml")
     erb = ERB.new(filename_template.read)
     return format_new_target_file(erb)
   end  
@@ -143,6 +143,7 @@ private
     target = config["source_dir"].join(name)
     return target unless target.exist?
     @filename_retry += 1
+    @filename_failed = name
     if ! config["filename_retry"].nil? || config["filename_retry"].to_i < @filename_retry
       return target
     end
@@ -199,7 +200,7 @@ private
   end  
 
   def valid_file_name?(name)
-    return name =~ config["file_in"]
+    return name =~ config["filename_in"]
   end
   
   def get_files

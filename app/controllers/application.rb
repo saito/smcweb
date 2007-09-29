@@ -80,7 +80,7 @@ private
     config["root"] = root
     config["source_dir"] = root.join("." + config["path"])
     config["label"] = type.capitalize if config["label"].nil?
-    config["file_in"] = Regexp.new(config["file_in"])
+    config["filename_in"] = Regexp.new(config["filename_in"])
     config["description"] = description
     
     return config
