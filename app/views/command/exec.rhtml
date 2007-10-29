@@ -1,0 +1,12 @@
+<h2>Command '<%=h params["id"] %>' result</h2>
+
+<div>
+<a href="<%= @config["uri_prefix"] %>/editor/index">Back</a>
+<ul>
+<li><%=h @command_data["label"] %></li>
+</ul>
+</div>
+
+<pre style="background:#F0F0F0; padding:1em" >
+<%=h @result %>
+</pre>

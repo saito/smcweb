@@ -22,6 +22,19 @@ tinyMCE.init({
 </script>
 
 <div id="sidebar">
+
+<% if 0 < @config["commands"].to_a.size%>
+<h2>Commands</h2>
+
+<ul>
+<% @config["commands"].each do |com| %>
+<li><a href="<%= @config["uri_prefix"] %>/command/exec/<%=h com["name"] %>"><%=h com["label"] %></a></li>
+<% end %>
+</ul>
+<% end %>
+
+<h2>Files</h2>
+
 <ul>
 <li><a href="<%= @config["uri_prefix"] %>/editor/index">Create new file</a></li>
 <%- @files.reverse.each do |f| -%>
@@ -86,7 +99,6 @@ tinyMCE.init({
 <%= hidden_field_tag "target", @target %>
 <input type="submit" value="Delete this file" onClick="return confirm('Are you sure DELETE this file?')" />
 </form>
-
 
 </div>
 </div>

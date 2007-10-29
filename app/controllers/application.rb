@@ -5,6 +5,8 @@ class ApplicationController < ActionController::Base
   # Pick a unique cookie name to distinguish our session data from others'
   session :off
   
+  MAX_ROOT_SEARCH = 30
+  
 private  
 
   def read_config_filter
@@ -87,7 +89,7 @@ private
   end
 
   def search_document_root(path)
-    30.times do
+    MAX_ROOT_SEARCH.times do
       if path.basename.to_s == "_smc" && path.directory?
         return path.parent.realpath
       end
