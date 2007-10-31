@@ -1,0 +1,9 @@
+[ <%- each_files(@root, @path) do |name, path, rel| -%>
+<%-   next if name[0] == ?.
+      if path.directory? -%>
+["<%= name %>", [["_load",{"method":"GET","url":"<%= url_for :action=>:tree_json, :path => rel %>"}]]],
+<%-   else -%>
+["<%= name %>", ""],
+<%-   end -%>
+<%- end -%>
+["",""]]

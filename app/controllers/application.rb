@@ -10,7 +10,21 @@ class ApplicationController < ActionController::Base
 private  
 
   def read_config_filter
-    @config = read_env_config
+    site = params[:site].to_s
+    type = params[:type].to_s
+    @config = read_config(site, type)
+
+    if @config.nil?
+      render :text => "404 object not found.", :status => 404
+      return false
+    end
+    return true
+  end
+
+  def read_site_config_filter
+    site = params[:site].to_s
+    @config = read_site_config(site)
+
     if @config.nil?
       render :text => "404 object not found.", :status => 404
       return false
@@ -55,17 +69,27 @@ private
     return result    
   end
 
-  def read_config(site, type)
+  def read_site_config(site)
     return nil unless site =~ /^[-\w]+$/
-    return nil unless type =~ /^[-\w]+$/
     site_config_path = Pathname.new("#{RAILS_ROOT}/config/sites/#{site}_#{RAILS_ENV}.yml")
     return nil unless site_config_path.file?
 
     site_config = YAML.load(ERB.new(site_config_path.read).result(binding))
     
-    type_dir = Pathname.new(site_config["config_dir"])
-    root = search_document_root(type_dir)
+    config_dir = Pathname.new(site_config["config_dir"])
+    root = search_document_root(config_dir)
     return nil if root.nil?
+    
+    pp root
+    site_config["root"] = root
+    
+    return site_config
+  end
+
+  def read_config(site, type)
+    read_site_config(site)
+    
+    return nil unless type =~ /^[-\w]+$/
 
     type_config_path = type_dir.join("#{type}.yml")
     return nil unless type_config_path.file?
@@ -79,7 +103,6 @@ private
     return nil if config["path"].nil?
     return nil unless config["path"][0] == ?/
 
-    config["root"] = root
     config["source_dir"] = root.join("." + config["path"])
     config["label"] = type.capitalize if config["label"].nil?
     config["filename_in"] = Regexp.new(config["filename_in"])
@@ -99,10 +122,4 @@ private
     return nil
   end
 
-  def read_env_config()
-    site = params[:site].to_s
-    type = params[:type].to_s
-    return read_config(site, type)
-  end
-  
 end

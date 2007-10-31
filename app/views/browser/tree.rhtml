@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja-JP" lang="ja-JP">
+<head>
+
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta http-equiv="content-script-type" content="text/javascript" />
+<meta http-equiv="content-style-type" content="text/css" />
+
+<link rel="index" href="./index" />
+<link rel="stylesheet" type="text/css" href="<%= @config["static_prefix"] %>/css/site.css" />
+
+<title>title</title>
+
+<!-- Required CSS -->
+<link type="text/css" rel="stylesheet" href="http://yui.yahooapis.com/2.3.1/build/treeview/assets/skins/sam/treeview.css"></link>
+<link type="text/css" rel="stylesheet" href="<%= @config["static_prefix"] %>/css/folders/tree.css"></link>
+ 
+<!-- Dependency source files --> 
+<script type="text/javascript" src="http://yui.yahooapis.com/2.3.1/build/yahoo/yahoo-min.js" ></script>
+<script type="text/javascript" src="http://yui.yahooapis.com/2.3.1/build/event/event-min.js" ></script>
+<script type="text/javascript" src="http://yui.yahooapis.com/2.3.1/build/connection/connection-min.js"></script>
+
+<!-- TreeView source file --> 
+<script type="text/javascript" src="http://yui.yahooapis.com/2.3.1/build/treeview/treeview-min.js" ></script>
+
+<script type="text/javascript" src="<%= @config["static_prefix"] %>/js/tree/mktreebyarray2.js"></script>
+
+</head>
+<body>
+
+
+<div id="treeDiv1"></div>
+
+<script type="text/javascript">
+
+var data= <%= render_partial "json" %>;
+
+YAHOO.tato.treeIni = function(){
+  var tree = new YAHOO.tato.tree("treeDiv1");
+  tree.mkTreeByArray(data);
+
+  // YAHOO.tato.loadTreeData.delay =100; 
+}
+
+//ページ読み込み後にカスタマイズ関数YAHOO.tato.treeIni()を起動します
+YAHOO.util.Event.addListener(window, "load", YAHOO.tato.treeIni);
+
+</script>
+
+
+</body>
+</html>  
