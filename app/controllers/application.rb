@@ -80,18 +80,18 @@ private
     root = search_document_root(config_dir)
     return nil if root.nil?
     
-    pp root
     site_config["root"] = root
+    site_config["site_config_dir"] = config_dir
     
     return site_config
   end
 
   def read_config(site, type)
-    read_site_config(site)
+    site_config = read_site_config(site)
     
     return nil unless type =~ /^[-\w]+$/
 
-    type_config_path = type_dir.join("#{type}.yml")
+    type_config_path = site_config["site_config_dir"] + "#{type}.yml"
     return nil unless type_config_path.file?
     
     docs = YAML.load_stream(ERB.new(type_config_path.read).result(binding)).documents
@@ -103,7 +103,7 @@ private
     return nil if config["path"].nil?
     return nil unless config["path"][0] == ?/
 
-    config["source_dir"] = root.join("." + config["path"])
+    config["source_dir"] = config["root"].join("." + config["path"])
     config["label"] = type.capitalize if config["label"].nil?
     config["filename_in"] = Regexp.new(config["filename_in"])
     config["description"] = description

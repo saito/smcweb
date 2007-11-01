@@ -5,6 +5,8 @@ class BrowserController < ApplicationController
 
   require 'pp'
 
+private
+
   def index
   end
   
