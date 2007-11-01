@@ -23,6 +23,12 @@ tinyMCE.init({
 
 <div id="sidebar">
 
+<%- if @config["logo"] -%>
+<div id="sitelogo">
+<a href="<%= @config["logo_link"] %>"><img src="<%= @config["logo"] %>" border="0"></a>
+</div>
+<%- end -%>
+
 <% if 0 < @config["commands"].to_a.size%>
 <h2>Commands</h2>
 
