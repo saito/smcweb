@@ -72,6 +72,7 @@ private
   def read_site_config(site)
     return nil unless site =~ /^[-\w]+$/
     site_config_path = Pathname.new("#{RAILS_ROOT}/config/sites/#{site}_#{RAILS_ENV}.yml")
+
     return nil unless site_config_path.file?
 
     site_config = YAML.load(ERB.new(site_config_path.read).result(binding))
@@ -89,6 +90,7 @@ private
   def read_config(site, type)
     site_config = read_site_config(site)
     
+    return nil if site_config.nil?
     return nil unless type =~ /^[-\w]+$/
 
     type_config_path = site_config["site_config_dir"] + "#{type}.yml"
