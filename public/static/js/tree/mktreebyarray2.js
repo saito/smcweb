@@ -1,11 +1,11 @@
-// http://allabout.co.jp/internet/javascript/closeup/CU20060530A/index.htm
+// based on http://allabout.co.jp/internet/javascript/closeup/CU20060530A/index.htm
 
-YAHOO.namespace('tato');
-YAHOO.tato.tree = function(id) {
+YAHOO.namespace('smc');
+YAHOO.smc.tree = function(id) {
 
   this.tree = new YAHOO.widget.TreeView(id);
   
-  YAHOO.tato.tree.prototype.mkTreeByArray = function (treeData,treeNode){
+  YAHOO.smc.tree.prototype.mkTreeByArray = function (treeData,treeNode){
     if (!treeNode) {
       treeNode = this.tree.getRoot(); 
     }
@@ -34,8 +34,9 @@ YAHOO.tato.tree = function(id) {
             tmpNode.collapse();
             break;
           case "_load": 
-            YAHOO.tato.loadTreeData(this, tmpNode, tmpData);
+            YAHOO.smc.loadTreeData(this, tmpNode, tmpData);
             break;
+          case "_exec":
           dafault:
             tmpNode.expand();
             break;
@@ -46,7 +47,7 @@ YAHOO.tato.tree = function(id) {
   };
 }
 
-YAHOO.tato.loadTreeData = function(oj, tmpNode, treeDataFrg) {
+YAHOO.smc.loadTreeData = function(oj, tmpNode, treeDataFrg) {
   if (! YAHOO.util.Connect) {
     return;
   }
@@ -59,7 +60,7 @@ YAHOO.tato.loadTreeData = function(oj, tmpNode, treeDataFrg) {
   
   var f = function (node, onCompleteCallback) {
     tmpNode = new YAHOO.widget.Node("", tmpNode.pearent, false);
-    var delay = YAHOO.tato.loadTreeData.delay;
+    var delay = YAHOO.smc.loadTreeData.delay;
     if (0 < delay) {
       setTimeout(onCompleteCallback, delay);
     } else {
@@ -90,4 +91,4 @@ YAHOO.tato.loadTreeData = function(oj, tmpNode, treeDataFrg) {
   };
 }
 
-YAHOO.tato.loadTreeData.delay = 0;
+YAHOO.smc.loadTreeData.delay = 0;
