@@ -1,0 +1,9 @@
+<a href="<%= url_for :action => :main %>" target="_parent">(root)</a>
+<%-
+buf = ""
+params['path'].to_s.split("/").each do |p| 
+  buf += "/" if buf != ""
+  buf += p
+-%>
+/ <a href="<%= url_for :action => :main, :path => buf %>" target="_parent"><%= p %></a>
+<%- end -%>

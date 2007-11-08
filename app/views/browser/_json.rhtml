@@ -1,9 +1,16 @@
-[ <%- each_files(@root, @path) do |name, path, rel| -%>
-<%-   next if name[0] == ?.
-      if path.directory? -%>
-["<%= name %>", [["_load",{"method":"GET","url":"<%= url_for :action=>:tree_json, :path => rel %>"}]]],
+[
+<%- each_files(@root, @path) do |name, path, rel| -%>
+<%-   next if name[0] == ?. %>
+<%-   if path.directory? -%>
+{
+  "label":"<%= name %>",
+  "command":"load",
+  "src":"<%= url_for :action=>:tree_json, :path => rel %>",
+  "href":"<%= url_for :action => :main, :path => rel %>",
+  "target":"main"
+},
 <%-   else -%>
-["<%= name %>", ""],
+{"label":"<%= name %>", "href": "<%= url_for :action => :main, :path => rel %>", "target":"main" },
 <%-   end -%>
 <%- end -%>
-["",""]]
+{}]

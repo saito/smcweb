@@ -14,8 +14,8 @@
 </head>
 
 <frameset cols="30%,*">
-    <frame src="tree" name="side">
-    <frame src="main" name="main">
+    <frame src="<%= url_for :action=> 'tree' %>" name="side">
+    <frame src="<%= url_for :action=> 'main' %>" name="main">
 </frameset>
 
 </html>

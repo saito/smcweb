@@ -29,22 +29,39 @@
 </head>
 <body>
 
-
-<div id="treeDiv1"></div>
+<div><input type="button" value="Publish All" /></div>
+<div id="tree"></div>
 
 <script type="text/javascript">
 
-var data= <%= render_partial "json" %>;
 
-YAHOO.tato.treeIni = function(){
-  var tree = new YAHOO.tato.tree("treeDiv1");
-  tree.mkTreeByArray(data);
+var data= [{
+"label":"(root)",
+".":<%= render_partial "json" %>,
+"open":true,
+"collapse":"all_children",
+"href":"<%= url_for :action => :main %>",
+"target":"main"
+}];
 
-  // YAHOO.tato.loadTreeData.delay =100; 
-}
 
-//ページ読み込み後にカスタマイズ関数YAHOO.tato.treeIni()を起動します
-YAHOO.util.Event.addListener(window, "load", YAHOO.tato.treeIni);
+YAHOO.util.Event.addListener(window, "load", function(){
+  var jsontree = new YAHOO.jsontree.JsonTree("tree");
+  jsontree.build(data);
+  
+  jsontree.tree.subscribe("labelClick", function(node) {
+    node.toggle();
+    return node.jsontree.linked;
+  });
+
+  jsontree.tree.subscribe("collapse", function(node) {
+    if (node.jsontree.collapse == "all_children") {
+      node.collapseAll();
+    }
+    return true;
+  });
+
+});
 
 </script>
 

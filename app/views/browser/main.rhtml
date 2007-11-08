@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja-JP" lang="ja-JP">
+<head>
+
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta http-equiv="content-script-type" content="text/javascript" />
+<meta http-equiv="content-style-type" content="text/css" />
+
+<link rel="index" href="./index" />
+<link rel="stylesheet" type="text/css" href="<%= @config["static_prefix"] %>/css/site.css" />
+
+<title>title</title>
+</head>
+
+<frameset rows="60,*" border="1">
+    <frame src="<%= url_for :action=> 'menu', :path => params['path'] %>" name="menu">
+    <frame src="<%= @config["contents_root_uri"] %>/<%=h params['path'] %>" name="view">
+</frameset>
+
+</html>
