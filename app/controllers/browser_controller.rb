@@ -20,6 +20,43 @@ class BrowserController < ApplicationController
     @root = root
     @path = path
   end
+  
+  def view
+    @root = root
+    @path = path
+
+    if @path.directory?
+      render :action => :directory_index
+    elsif @path.to_s =~ /\.smc$/
+      @headers["content-type"] = "text/plain; charset=utf-8"
+      render :text => File.new(@path).read
+    else
+      redirect_to "#{config['contents_root_uri']}/#{params['path']}"
+    end
+  end
+  
+  def form
+    @root = root
+    @path = path
+    if @form.nil?
+      @form = SimpleEditor.new
+      @form.body = File.new(@path).read
+      @form.path = params['path']
+    end
+  end
+  
+  def save
+    @form = SimpleEditor.new(:form, params)
+    @root = root
+    @path = path(@form.path)
+    
+    open(@path, "w") do |io|
+      io << @form.body
+    end
+    
+    redirect_to :action => :view, :path => @form.path
+  end
+  
 
 private
 
@@ -27,11 +64,13 @@ private
     return realpath(config["root"], Pathname.new("/"))  
   end
 
-  def path
-    if params[:path].is_a? Array
-      path = params[:path].join("/")
+  def path(path = nil)
+    path = params[:path] if path.nil?
+  
+    if path.is_a? Array
+      path = path.join("/")
     else
-      path = params[:path].to_s
+      path = path.to_s
     end
     path = realpath(@root + path, @root)
     return path

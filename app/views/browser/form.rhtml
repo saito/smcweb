@@ -11,30 +11,14 @@
 <link rel="stylesheet" type="text/css" href="<%= @config["static_prefix"] %>/css/site.css" />
 
 <title>title</title>
-
 </head>
-
 <body>
 
-<%= link_to "(root)", { :action => :main }, { :target => "_parent" } %>
-
-<%-
-buf = ""
-params['path'].to_s.split("/").each do |p| 
-  buf += "/" if buf != ""
-  buf += p
--%>
-/ <a href="<%= url_for :action => :main, :path => buf %>" target="_parent"><%= p %></a>
-<%- end -%>
-
-<%= link_to "#", { :action => :index, :path => params["path"] }, { :target => "_blank" } %>
-<br />
-[
-<%= link_to("Edit", { :action => "form", :path => params["path"] }, :target=> "view") %> 
-|
-<a href="<%= @config['trac_revlog_uri'] %>/<%=h params['path'] %>" target="view">History</a> 
-]
+<% form_tag({:action => 'save'}, {:name=>'simpleEditor'}) do %>
+  <%= text_area :form, :body, :size=> "80x20" %>
+  <%= hidden_field :form, :path %>
+  <%= submit_tag 'Save' %>
+<% end %>
 
 </body>
-
 </html>

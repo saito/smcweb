@@ -14,8 +14,8 @@
 </head>
 
 <frameset rows="60,*" border="1">
-    <frame src="<%= url_for :action=> 'menu', :path => params['path'] %>" name="menu">
-    <frame src="<%= @config["contents_root_uri"] %>/<%=h params['path'] %>" name="view">
+    <frame src="<%= url_for :action => :menu, :path => params['path'] %>" name="menu">
+    <frame src="<%= url_for :action => :view, :path => params['path'] %>" name="view">
 </frameset>
 
 </html>
