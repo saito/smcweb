@@ -13,13 +13,32 @@
 <title>title</title>
 </head>
 <body>
-
-<%- Dir.new(@path).each do |name| -%>
-<%- if name =~ /\.(?:jpg|gif|png)$/ -%>
-<img width="60" height="60" src="<%= @config['contents_root_uri'] + "/" + params['path'] + "/" + name %>"> <%=h name %><br />
-<%- else -%>
-
+<%= @items.to_a.length %> files:
+<table>
+<%- @items.to_a.each do |item| -%>
+<tr>
+<td>
+<%- if item.type == :image -%>
+<img width="64" height="64" src="<%= item.uri %>">
+<%- elsif item.type == :directory -%>
+<img width="32" height="32" src="<%= @config["static_prefix"] %>/images/browser/directory.png">
+<%- elsif item.type == :dirsmc -%>
+<img width="32" height="32" src="<%= @config["static_prefix"] %>/images/browser/dirsmc.png">
+<%- elsif item.type == :file -%>
+<%-
+if item.name =~ /\.smc$/
+  iconname = "smc"
+else
+  iconname = "file"
+end 
+-%>
+<img width="32" height="32" src="<%= @config["static_prefix"] %>/images/browser/<%= iconname %>.png">
 <%- end -%>
+</td>
+<td>
+<%= link_to item.name, { :action => :main, :path => item.path }, :target => "main" %>
+</td>
+</tr>
 <%- end -%>
 
 </body>
