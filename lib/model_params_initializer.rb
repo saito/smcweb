@@ -1,7 +1,7 @@
 module ModelParamsInitializer
 
   # 全て文字列のままプロパティに設定します。
-  def params_initialize(params, target, keys)
+  def params_initialize(params, target, keys) # FIXME
     @errors = []
     return if target.nil?
     return if params.nil?

@@ -1,11 +1,11 @@
 class SimpleEditor
   include ModelParamsInitializer
 
-  attr_accessor :path, :body
+  attr_accessor :body, :file_name
   
-  def initialize(target = nil, params = nil)
-    keys = [:path, :body]
+  def initialize(params = nil, target = nil)
+    keys = [:body, :file_name]
     params_initialize(params, target, keys)
-  end  
+  end
   
 end

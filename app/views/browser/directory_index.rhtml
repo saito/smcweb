@@ -13,30 +13,36 @@
 <title>title</title>
 </head>
 <body>
+
+<% form_tag({:action => "upload"}, {:multipart => true, :target=>"_parent"}) do %>
+    <%= hidden_field_tag "path", params[:path] %>
+    <%= file_field_tag "upload_file" %>
+    <%= submit_tag  "Upload" %>
+<% end %>
+
 <%= @items.to_a.length %> files:
 <table>
 <%- @items.to_a.each do |item| -%>
 <tr>
 <td>
 <%- if item.type == :image -%>
-<img width="64" height="64" src="<%= item.uri %>">
+<img width="32" height="32" src="<%= item.uri %>">
 <%- elsif item.type == :directory -%>
 <img width="32" height="32" src="<%= @config["static_prefix"] %>/images/browser/directory.png">
 <%- elsif item.type == :dirsmc -%>
 <img width="32" height="32" src="<%= @config["static_prefix"] %>/images/browser/dirsmc.png">
+<%- elsif item.type == :smc -%>
+<img width="32" height="32" src="<%= @config["static_prefix"] %>/images/browser/smc.png">
 <%- elsif item.type == :file -%>
-<%-
-if item.name =~ /\.smc$/
-  iconname = "smc"
-else
-  iconname = "file"
-end 
--%>
-<img width="32" height="32" src="<%= @config["static_prefix"] %>/images/browser/<%= iconname %>.png">
+<img width="32" height="32" src="<%= @config["static_prefix"] %>/images/browser/file.png">
 <%- end -%>
 </td>
 <td>
 <%= link_to item.name, { :action => :main, :path => item.path }, :target => "main" %>
+</td>
+
+<td>
+<%= File.new(item.realpath).mtime.strftime("%Y-%m-%d %H:%M:%S") %>
 </td>
 </tr>
 <%- end -%>

@@ -14,11 +14,44 @@
 </head>
 <body>
 
+<%- if @item.text_editable -%>
+<div style="margin-bottom:4em;">
 <% form_tag({:action => 'save'}, {:name=>'simpleEditor'}) do %>
   <%= text_area :form, :body, :size=> "80x20" %>
-  <%= hidden_field :form, :path %>
+  <%= hidden_field_tag "path",  params[:path] %>
   <%= submit_tag 'Save' %>
 <% end %>
+</div>
+<%- end -%>
+
+<div>
+<% form_tag({:action => "rename"}, {:target => "_parent"}) do %>
+  <%= hidden_field_tag "path",  params[:path] %>
+  <%= text_field :form, :file_name, :size=> 50 %><%= submit_tag 'Rename' %>
+<% end %>
+</div>
+
+<div style="margin-top:0.5em;">
+<% form_tag({:action => "upload"}, {:multipart => true, :target=>"_parent"}) do %>
+    <%= hidden_field_tag "path", params[:path] %>
+    <%= file_field_tag "upload_file", :size=>50 %>
+    <%= submit_tag  "Replace" %>
+<% end %>
+</div>
+
+
+<div style="margin-top:0.5em;">    
+<% form_tag({:action => "delete"}, {:target => "_parent"}) do %>
+  <%= hidden_field_tag "path",  params[:path] %>
+  <%= submit_tag  "Delete" %>
+<% end %>
+</div>
+
+<%- if @item.type == :image -%>
+<div style="margin-top:0.5em;">
+<img src="<%= @item.uri %>">
+</div>
+<%- end -%>
 
 </body>
 </html>
