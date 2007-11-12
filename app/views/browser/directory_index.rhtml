@@ -16,7 +16,7 @@
 
 <% form_tag({:action => "upload"}, {:multipart => true, :target=>"_parent"}) do %>
     <%= hidden_field_tag "path", params[:path] %>
-    <%= file_field_tag "upload_file" %>
+    <%= file_field_tag "upload_file", {:size => 50} %>
     <%= submit_tag  "Upload" %>
 <% end %>
 

@@ -136,6 +136,29 @@ class BrowserController < ApplicationController
     redirect_to :action => :main, :path => Pathname.new(params[:path]).parent
   end
 
+  def publish
+    @root = root
+    @path = secure_path
+    @item = current_item
+    
+    if @item.type == :smc || @item.type == :directory
+      runner = SmallCage::Runner.new({:path => @path })
+      runner.update
+    else
+      redirect_to :action => :main, :path => params[:path]
+    end 
+    
+    if @item.type == :smc
+      redirect_to :action => :main, :path => params[:path][0...-4]
+    else
+      if (@path + "index.html").exist?
+        redirect_to :action => :main, :path => (Pathname.new(params[:path].to_s) + "index.html").to_s
+      else
+        redirect_to :action => :main, :path => params[:path].to_s
+      end
+    end
+  end
+
 private
 
   def current_item
