@@ -29,7 +29,7 @@
 </head>
 <body>
 
-<div><input type="button" value="Publish All" /></div>
+<div><input type="button" value="Publish All" /><a href="tree">reload</a></div>
 <div id="tree"></div>
 
 <script type="text/javascript">
@@ -50,7 +50,9 @@ YAHOO.util.Event.addListener(window, "load", function(){
   jsontree.build(data);
   
   jsontree.tree.subscribe("labelClick", function(node) {
-    node.toggle();
+    if (! node.expanded) {
+        node.toggle();
+    }
     return node.jsontree.linked;
   });
 
