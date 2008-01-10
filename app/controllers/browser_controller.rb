@@ -34,7 +34,7 @@ class BrowserController < ApplicationController
       @headers["content-type"] = "text/plain; charset=utf-8"
       render :text => File.new(@path).read
     else
-      redirect_to "#{config['contents_root_uri']}/#{params['path']}"
+      redirect_to "#{config['contents_root_uri'].to_s}/#{params['path'].to_s}"
     end
   end
   
@@ -164,7 +164,7 @@ private
   def current_item
     realpath = @path
     path = Pathname.new(params["path"].to_s)
-    uri = config['contents_root_uri'] + "/" + params["path"].to_s
+    uri = config['contents_root_uri'].to_s + "/" + params["path"].to_s
     return DirectoryIndexItem.new(path, realpath, uri)
   end
 
@@ -176,7 +176,7 @@ private
     
       path = Pathname.new(params["path"].to_s) + name
       realpath = @path + name
-      uri = config['contents_root_uri'] + "/" + path.to_s
+      uri = config['contents_root_uri'].to_s + "/" + path.to_s
       d = DirectoryIndexItem.new(path, realpath, uri)
       @items << d
     end
