@@ -6,7 +6,7 @@ DIR=`dirname $0`/../..
 case "$1" in
   start)
   	cd $DIR
-    mongrel_rails start -d -p $PORT -eproduction
+    mongrel_rails start -d -p $PORT -eproduction --prefix=/smcweb
     ;;
   stop)
   	cd $DIR
