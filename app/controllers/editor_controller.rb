@@ -15,7 +15,7 @@ class EditorController < ApplicationController
     
     init_fields
     init_form
-    render :action => :index
+    render_form
   end
   
   def save
@@ -37,7 +37,7 @@ class EditorController < ApplicationController
     publish(@target_file)
 
     @files = get_files
-    render :action => :index
+    render_form
   end
 
   def delete
@@ -192,7 +192,7 @@ private
     return nil if name.nil?
     file = Pathname.new(config["config_dir"]).join("forms/" + name + ".yml")
     raise "form config file not exists: " + file.to_s unless file.file?
-   
+    
     config = YAML.load(File.read(file))
     raise "form config must be array: " + file.to_s unless config.is_a?(Array)
 
@@ -213,6 +213,27 @@ private
       result << path
     end
     return result.sort {|a,b| a.to_s <=> b.to_s }
+  end
+
+  def render_form
+    layout = find_layout
+    if layout.nil?
+      render :action => :index
+    else
+      render(:file => layout, :use_full_path => false)
+    end
+  end
+
+  def find_layout
+    dir = config["site_config_dir"]
+    file = config["layout"]
+    return nil if (dir.nil? || file.nil?)
+
+    layout = dir + file
+    if layout.file?
+      return layout.to_s
+    end
+    return nil
   end
 
 end

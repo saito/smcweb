@@ -1,0 +1,8 @@
+<h2>Files</h2>
+
+<ul>
+<li><a href="<%= @config["uri_prefix"] %>/editor/index">Create new file</a></li>
+<%- @files.reverse.each do |f| -%>
+<li><a href="<%= @config["uri_prefix"] %>/editor/index?target=<%=h f.basename %>"><%=h f.basename %></a></li>
+<%- end -%>
+</ul>

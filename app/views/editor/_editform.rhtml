@@ -1,0 +1,53 @@
+<form method="post" action="<%= @config["uri_prefix"] %>/editor/save">
+<%- @fields.each do |f| -%>
+<%- if f.typ == "hidden" -%>
+<%= hidden_field "form", "field_" + f.name %>
+<%- end -%>
+<%- end -%>
+<table>
+<tr>
+<td>File</td>
+<td><%= text_field_tag "target", @target, :size=>60 %></td>
+</tr>
+
+<%- 
+@fields.each do |f|
+    next if f.typ == "hidden"
+-%>
+<tr>
+<td><%=h f.label %></td>
+<td>
+
+<%- if f.typ == "text" -%>
+  <%= text_field "form", "field_" + f.name, f.options.nil? ? {:size => 60 } : f.options %>
+<%- elsif f.typ == "textarea" -%>
+  <%= text_area "form", "field_" + f.name, f.options.nil? ? {:size => "60x20"} : f.options %>
+<%- elsif f.typ == "tinymce" -%>
+  <%= text_area "form", "field_" + f.name, (f.options.nil? ? {:size => "60x20"} : f.options.dup).merge({:class => "tinymce_#{f.name}"}) %>
+<%- elsif f.typ == "array" -%>
+  <%= text_area "form", "field_" + f.name, f.options.nil? ? {:size => "60x20"} : f.options %>
+<%- elsif f.typ == "date" -%>
+  <%= text_field "form", "field_" + f.name, f.options.nil? ? {:size => 20 } : f.options %>
+  <script type="text/javascript">
+  InputCalendar.createOnLoaded(
+    "<%= f.options["id"] %>",
+	{
+		format: "<%= f.options["format"] %>"
+	}
+  );
+  </script>
+
+<%- end -%>
+</td>
+</tr>
+<%- end -%>
+
+<tr>
+<td colspan="2" align="right">
+<%= submit_tag "保存" %>
+</td>
+</tr>
+
+</table>
+
+</form>

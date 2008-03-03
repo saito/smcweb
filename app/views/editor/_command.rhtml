@@ -1,0 +1,9 @@
+<% if 0 < @config["commands"].to_a.size%>
+<h2>Commands</h2>
+
+<ul>
+<% @config["commands"].each do |com| %>
+<li><a href="<%= @config["uri_prefix"] %>/command/exec/<%=h com["name"] %>"><%=h com["label"] %></a></li>
+<% end %>
+</ul>
+<% end %>

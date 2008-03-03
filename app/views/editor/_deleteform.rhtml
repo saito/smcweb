@@ -1,0 +1,4 @@
+<form method="post" action="<%= @config["uri_prefix"] %>/editor/delete">
+<%= hidden_field_tag "target", @target %>
+<input type="submit" value="削除" onClick="return confirm('削除します。よろしいですか？')" />
+</form>
