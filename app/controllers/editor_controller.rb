@@ -252,7 +252,7 @@ private
   end
 
   def find_layout
-    dir = config["site_config_dir"]
+    dir = config["site_config_dir"] + "forms"
     return nil if (dir.nil?)
 
     file_name = params[:type] + ".rhtml"
