@@ -50,7 +50,18 @@ class EditorController < ApplicationController
     index    
   end
   
-  
+  def delete_multiple
+    targets = get_target_files(true)
+    if !targets.nil?
+      targets.each do |t|
+        exec_delete(t)
+      end
+      publish(nil)
+    end
+    index
+  end
+
+
 private  
 
   def publish(target_file)
@@ -163,6 +174,22 @@ private
     return result
   end
   
+  def get_target_files(only_exists = false)
+    names = params[:targets]
+    return nil if names.nil?
+    files = []
+    names.each do |n|
+      result = config["source_dir"].join(n)
+      if result.exist? && ! result.file?
+        raise "Target already exists, but not a file.: " + name
+      elsif only_exists
+        next unless result.file?
+      end
+      files.push(result)
+    end
+    return files
+  end
+
   def target_obj
     if @target_obj.nil?
       return nil unless @target_file.exist?
