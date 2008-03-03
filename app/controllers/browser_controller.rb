@@ -49,6 +49,14 @@ class BrowserController < ApplicationController
     @path = secure_path
     @item = current_item
 
+    loader = SmallCage::Loader.new(@path)
+    dir_conf = loader.load(@path);
+    editor = dir_conf["dirs"].last["editor"]
+    unless editor.nil?
+      redirect_to :controller => "editor", :action => "index", :type => editor, :target => @path.basename
+      return;
+    end
+
     if @form.nil?
       @form = SimpleEditor.new
       @form.body = File.new(@path).read
