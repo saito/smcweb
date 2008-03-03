@@ -1,5 +1,6 @@
 class SmcForm
   # require 'yaml/encoding'
+  attr_accessor :values
 
   def initialize(fields)
     @fields = fields

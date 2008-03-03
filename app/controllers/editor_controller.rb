@@ -226,12 +226,13 @@ private
 
   def find_layout
     dir = config["site_config_dir"]
-    file = config["layout"]
-    return nil if (dir.nil? || file.nil?)
+    return nil if (dir.nil?)
 
-    layout = dir + file
-    if layout.file?
-      return layout.to_s
+    file_name = params[:type] + ".rhtml"
+    file_name = params[:type] + ".html.erb" unless (dir + file_name).file?
+
+    if (dir + file_name).file?
+      return (dir + file_name).to_s
     end
     return nil
   end
