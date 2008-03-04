@@ -9,14 +9,14 @@
 
 <table>
 
-<% if !@config["file_name"].nil? && @config["file_name"]["hidden"] == true %>
+<%- if !@config["file_name"].nil? && @config["file_name"]["hidden"] == true -%>
 <%= hidden_field_tag "target", @target %>
 <% else %>
 <tr>
 <td>File</td>
 <td><%= text_field_tag "target", @target, :size=>60 %></td>
 </tr>
-<% end %>
+<%- end -%>
 
 <%- 
 @fields.each do |f|
@@ -25,6 +25,8 @@
 <tr>
 <td><%=h f.label %></td>
 <td>
+
+
 
 <%- if f.typ == "text" -%>
 
@@ -55,6 +57,8 @@
   </script>
 
 <%- end -%>
+
+
 </td>
 </tr>
 <%- end -%>

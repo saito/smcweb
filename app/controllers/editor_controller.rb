@@ -31,6 +31,7 @@ class EditorController < ApplicationController
     @target_file = get_target_file(false)
     if @target_file.nil?
       render :text => "ERROR: Illegal file name."
+      return;
     end
     @target = relpath(@target_file)
     
@@ -161,14 +162,33 @@ private
 
   def format_new_target_file(erb)
     name = erb.result(binding)
+    # 同名ファイルが存在する場合"-n"を添付
+    name = resolve_file_name(name)
     target = config["source_dir"].join(name)
     return target unless target.exist?
+
     @filename_retry += 1
     @filename_failed = name
-    if ! config["filename_retry"].nil? || config["filename_retry"].to_i < @filename_retry
+    if config["filename_retry"].nil? || config["filename_retry"].to_i < @filename_retry
       return target
     end
     return format_new_target_file(erb)
+  end
+
+  def resolve_file_name(name)
+    return name if @filename_retry == 0
+    tokens = name.split(".")
+    return name if tokens.size <= 1
+
+    result = ""
+    tokens.each do |token|
+      if result.empty?
+        result += token + "-" + @filename_retry.to_s
+      else
+        result += "." + token
+      end
+    end
+    return result
   end
 
   def get_target_file(only_exists = false)

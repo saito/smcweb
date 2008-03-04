@@ -1,9 +1,9 @@
 <% local_conf = @config["file_list"] %>
 <% if !local_conf.nil? %>
 
-<h2>
+<h3>
 <%= (local_conf["title"].nil?) ? "保存済みファイル一覧" : local_conf["title"] %>
-</h2>
+</h3>
 
 <% if local_conf["use_multiple_delete"] == true %>
 
