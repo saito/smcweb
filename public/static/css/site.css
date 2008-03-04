@@ -10,19 +10,19 @@
 
 #main{
   margin-left: 200px;
+  margin-top: 12px;
   background: #fff;
 }
 
 #container {
   width: 600px;
-  margin: 30px auto 0 auto;
   text-align: left;
   font-size: 0.8em;
 }
 
 #description {
   background: #EEE;
-  padding: 0.8em;
+  padding: 12px;
   margin-bottom: 2em;
 }
 
