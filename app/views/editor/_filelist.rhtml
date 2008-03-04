@@ -1,8 +1,42 @@
-<h2>Files</h2>
+<% local_conf = @config["file_list"] %>
+<% if !local_conf.nil? %>
 
-<ul>
-<li><a href="<%= @config["uri_prefix"] %>/editor/index">Create new file</a></li>
-<%- @files.reverse.each do |f| -%>
-<li><a href="<%= @config["uri_prefix"] %>/editor/index?target=<%=h f.basename %>"><%=h f.basename %></a></li>
-<%- end -%>
-</ul>
+<h2>
+<%= (local_conf["title"].nil?) ? "保存済みファイル一覧" : local_conf["title"] %>
+</h2>
+
+<% if local_conf["use_multiple_delete"] == true %>
+
+  <% form_tag({:action => "delete_multiple"}) do %>
+  <% @files.reverse.each do |f| %>
+  <div style="margin-bottom:6px;">
+    <%= check_box_tag "targets[]", f.basename %>
+    &nbsp;
+    <a href="<%= @config["uri_prefix"] %>/editor/index?target=<%=h f.basename %>">
+	<% if local_conf["labels"].nil? %>
+	  <%=h f.basename %>
+	<% else %>
+	   <% local_conf["labels"].each do |label| %>
+	   <%= get_content(f, label) %> 
+	   <% end %>
+	<% end %>
+    </a>
+  </div>
+  <% end %>
+  <%= submit_tag "削除", :onclick => "return #{confirm_javascript_function("チェックした項目を削除します。よろしいですか？") }" %>
+  <% end %>
+
+<% else %>
+
+  <% @files.reverse.each do |f| %>
+  <div style="margin-bottom:6px;">
+    <a href="<%= @config["uri_prefix"] %>/editor/index?target=<%=h f.basename %>">
+  	<%= get_content(f, "date") %> <%= get_content(f, "title") %>
+    </a>
+  </div>
+  <% end %>
+
+<% end %>
+
+
+<% end %>

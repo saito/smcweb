@@ -18,6 +18,14 @@ class EditorController < ApplicationController
     render_form
   end
   
+  def save_or_delete
+    if params[:submit] == "保存"
+      save
+    elsif params[:submit] == "削除"
+      delete
+    end
+  end
+
   def save
     @files = get_files
     @target_file = get_target_file(false)

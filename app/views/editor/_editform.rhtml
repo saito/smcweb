@@ -1,4 +1,4 @@
-<form method="post" action="<%= @config["uri_prefix"] %>/editor/save">
+<form method="post" action="<%= @config["uri_prefix"] %>/editor/save_or_delete">
 <%- @fields.each do |f| -%>
 <%- if f.typ == "hidden" -%>
 <%= hidden_field "form", "field_" + f.name %>
@@ -44,7 +44,8 @@
 
 <tr>
 <td colspan="2" align="right">
-<%= submit_tag "保存" %>
+<%= submit_tag "削除", :onclick => "return #{confirm_javascript_function("削除します。よろしいですか？") }", :name => "submit" %>
+<%= submit_tag "保存", :name => "submit", :style => "width:100px; margin-left: 12px;" %>
 </td>
 </tr>
 
