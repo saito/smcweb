@@ -45,8 +45,16 @@ class EditorController < ApplicationController
     
     publish(@target_file)
 
+    # ファイル名が変更された場合、旧ファイルを削除
+    target_old = params[:target_original]
+    if target_old != params[:target]
+      file_old = get_target_file(true, target_old)
+      exec_delete(file_old)
+    end
+
     @files = get_files
     render_form
+
   end
 
   def delete
@@ -191,8 +199,8 @@ private
     return result
   end
 
-  def get_target_file(only_exists = false)
-    name = params["target"]
+  def get_target_file(only_exists = false, name = nil)
+    name = params["target"] if name.nil?
     return nil if name.nil?
     return nil unless valid_file_name?(name)
     result = config["source_dir"].join(name)
@@ -203,7 +211,7 @@ private
     end
     return result
   end
-  
+
   def get_target_files(only_exists = false)
     names = params[:targets]
     return nil if names.nil?

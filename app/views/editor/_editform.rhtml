@@ -17,6 +17,7 @@
 <td><%= text_field_tag "target", @target, :size=>60 %></td>
 </tr>
 <%- end -%>
+<%= hidden_field_tag "target_original", @target %>
 
 <%- 
 @fields.each do |f|
