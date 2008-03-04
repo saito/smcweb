@@ -115,7 +115,9 @@ private
     
     if file.to_s =~ /.smc/
       out_file = file.to_s[0...-4]
-      File.delete(out_file)
+      if Pathname.new(out_file).file?
+        File.delete(out_file)
+      end
     end
   end
 
