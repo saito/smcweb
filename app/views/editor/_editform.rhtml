@@ -1,4 +1,4 @@
-<form method="post" action="<%= @config["uri_prefix"] %>/editor/save_or_delete">
+<form method="post" action="<%= @config["uri_prefix"] %>/editor/save_or_delete" name="smcForm" onsubmit="setFilename();">
 <%- @fields.each do |f| -%>
 <%- if f.typ == "hidden" -%>
 <%= hidden_field "form", "field_" + f.name %>
@@ -76,3 +76,21 @@
 </table>
 
 </form>
+
+<%- if filename_override? -%>
+<script type="text/javascript">
+<% if "date" == @config["filename_override"]["type"] %>
+function setFilename() {
+  var target = document.smcForm.target;
+  var input = $("<%= @config["filename_override"]["id"] %>");
+  if (input.value == null) {
+    return;
+  }
+  var df = new SimpleDateFormat("<%= @config["filename_override"]["input_pattern"] %>");
+  var date = df.parse(input.value);
+  var df2 = new SimpleDateFormat("<%= @config["filename_override"]["output_pattern"] %>")
+  target.value = df2.format(date);
+}
+<% end %>
+</script>
+<%- end -%>
