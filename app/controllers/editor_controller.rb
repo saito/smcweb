@@ -4,7 +4,7 @@ class EditorController < ApplicationController
   attr_reader :config
   layout "default"
   
-  require 'pp'
+#  require 'pp'
   require 'smallcage'
 
   def index
@@ -12,7 +12,8 @@ class EditorController < ApplicationController
     @target_file = get_target_file(true)
     @target_file ||= new_target_file
     @target = relpath(@target_file)
-    
+    @is_new = params[:target].nil?
+
     init_fields
     init_form
     render_form
@@ -33,6 +34,13 @@ class EditorController < ApplicationController
       render :text => "ERROR: Illegal file name."
       return;
     end
+
+    # (新規 || リネーム) && 重複 -> ファイル名再発番
+    if ((params[:target_original].nil? || params[:target] != params[:target_original]) && @target_file.file?)
+      file_name = resolve_file_name(@target_file.basename.to_s)
+      @target_file = @target_file.parent.join(file_name)
+    end
+
     @target = relpath(@target_file)
     
     init_fields
@@ -42,19 +50,21 @@ class EditorController < ApplicationController
     File.open(@target_file, "w") do |io|
       io << yaml
     end
+    purge_old_file
     
     publish(@target_file)
 
-    # ファイル名が変更された場合、旧ファイルを削除
-    target_old = params[:target_original]
-    if target_old != params[:target]
-      file_old = get_target_file(true, target_old)
-      exec_delete(file_old)
-    end
-
     @files = get_files
     render_form
+  end
 
+  def purge_old_file
+    # ファイル名が変更された場合、旧ファイルを削除
+    target_old = params[:target_original]
+    if !target_old.nil? && target_old != params[:target]
+      file_old = get_target_file(true, target_old)
+      exec_delete(file_old) unless file_old.nil?
+    end
   end
 
   def delete
@@ -162,7 +172,6 @@ private
   end
 
   def new_target_file
-    @filename_retry = 0
     filename_template = Pathname.new(config["config_dir"]).join("filenames/" + config["filename_out"] + ".rhtml")
     erb = ERB.new(filename_template.read)
     return format_new_target_file(erb)
@@ -170,25 +179,40 @@ private
 
   def format_new_target_file(erb)
     name = erb.result(binding)
-    # 同名ファイルが存在する場合"-n"を添付
     name = resolve_file_name(name)
-    target = config["source_dir"].join(name)
-    return target unless target.exist?
-
-    @filename_retry += 1
-    @filename_failed = name
-    if config["filename_retry"].nil? || config["filename_retry"].to_i < @filename_retry
-      return target
-    end
-    return format_new_target_file(erb)
+    return get_source_file_path(name)
   end
 
   def resolve_file_name(name)
-    return name if @filename_retry == 0
+    @filename_retry = 0
+    # 同名ファイルが存在する場合"-n"を添付、"-n"が存在する場合は加算
+    target = get_source_file_path(name)
+    return name if !target.exist?
+    if config["filename_retry"].to_s.empty? || config["filename_retry"].to_i < @filename_retry
+      return target
+    end
+    @filename_retry += 1
+    
+    if name =~ /-\d+\./
+      result = increment_branch_number(name)
+    else
+      result = add_number_before_period(name)
+    end
+
+    return resolve_file_name(result)
+  end
+
+  def increment_branch_number(name)
+    result = ""
+    /(.+)-(\d+)\.(.+)/ =~ name
+    num = $2.to_i + 1
+    return $1 + "-" + num.to_s + "." + $3
+  end
+
+  def add_number_before_period(name)
+    result = ""
     tokens = name.split(".")
     return name if tokens.size <= 1
-
-    result = ""
     tokens.each do |token|
       if result.empty?
         result += token + "-" + @filename_retry.to_s
@@ -196,7 +220,11 @@ private
         result += "." + token
       end
     end
-    return result
+    return result;
+  end
+
+  def get_source_file_path(name)
+    target = Pathname.new(config["source_dir"]).join(name)    
   end
 
   def get_target_file(only_exists = false, name = nil)
