@@ -31,7 +31,13 @@
   <% @files.reverse.each do |f| %>
   <div style="margin-bottom:6px;">
     <a href="<%= @config["uri_prefix"] %>/editor/index?target=<%=h f.basename %>">
-  	<%= get_content(f, "date") %> <%= get_content(f, "title") %>
+	<% if local_conf["labels"].nil? %>
+	  <%=h f.basename %>
+	<% else %>
+	   <% local_conf["labels"].each do |label| %>
+	   <%= get_content(f, label) %> 
+	   <% end %>
+	<% end %>
     </a>
   </div>
   <% end %>
