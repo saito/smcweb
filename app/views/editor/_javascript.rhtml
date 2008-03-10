@@ -1,6 +1,7 @@
 <%= javascript_include_tag :defaults %>
 <%- if contains_typ("tinymce") -%>
 <script language="javascript" type="text/javascript" src="<%= @config["static_prefix"] %>/js/tiny_mce/tiny_mce.js"></script>
+<%- @fields.each do |f| -%>
 <script language="javascript" type="text/javascript">
 tinyMCE.init({
 	mode : "textareas",
@@ -18,6 +19,7 @@ tinyMCE.init({
 	theme_advanced_statusbar_location : "bottom"
 });
 </script>
+<%- end -%>
 <%- end -%>
 
 <%- if contains_typ("date") -%>
