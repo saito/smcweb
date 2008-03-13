@@ -52,8 +52,11 @@ params['path'].to_s.split("/").each do |p|
 <td>
 [
 <%= link_to("View", { :action => "view", :path => params["path"] }, :target=> "view") %>
-<% if @item.type != :directory %>
+<% if @item.type != :directory && !@prohibit_editing %>
 | <%= link_to("Edit", { :action => "form", :path => params["path"] }, :target=> "view") %>
+<% end %>
+<% if ! @item.output.nil? %>
+| <%= link_to("View Output", { :action => "main", :path => @item.output }, :target=> "main") %>
 <% end %>
 <% if @item.type == :smc || @item.type == :directory %>
 | <%= link_to("Publish", { :action => "publish", :path => params["path"] }, :target=> "main") %>

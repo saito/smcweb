@@ -1,5 +1,5 @@
 class DirectoryIndexItem
-  attr_accessor :name, :path, :realpath, :uri, :type, :text_editable, :smc
+  attr_accessor :name, :path, :realpath, :uri, :type, :text_editable, :smc, :output
     
   def initialize(path, realpath, uri)
     @path = path
@@ -8,6 +8,7 @@ class DirectoryIndexItem
     @realpath = realpath
     @text_editable = false
     @smc = nil
+    @output = nil
 
     if realpath.directory?
       @type = :directory
@@ -28,6 +29,13 @@ class DirectoryIndexItem
       source = @realpath.parent + (@realpath.basename.to_s + ".smc")
       if source.file?
         @smc = @path.to_s + ".smc"
+      end
+      if @type == :smc
+        subname = @name.sub(/\.smc$/, "")
+        output = @realpath.parent + subname
+        if output.file?
+          @output = (@path.parent + subname).to_s
+        end
       end
     end
   end

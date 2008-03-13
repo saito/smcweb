@@ -46,6 +46,7 @@ class BrowserController < ApplicationController
     @root = root
     @path = secure_path
     @item = current_item
+    @prohibit_editing = prohibit_editing
   end
   
   def form
@@ -245,6 +246,15 @@ private
     end
     
     return path
+  end
+
+  # サイト設定ファイルのprohibit_editing_output_fileでtrueが指定されており、
+  # 対応する.smcファイルが存在する場合にtrueを返す．
+  def prohibit_editing
+    if config["prohibit_editing_output_file"].nil? || !config["prohibit_editing_output_file"]
+      return false;
+    end
+    return !@item.smc.nil?
   end
 
 
