@@ -30,7 +30,7 @@
 </td>
 </tr>
 <% end %>
-<% form_tag({:action => "new"}) do %>
+<% form_tag({:action => "new"}, {:target=>"_parent"}) do %>
 <tr>
 <td style="padding-top:6px; padding-right:12px">
   <%= hidden_field_tag "path", params[:path] %>

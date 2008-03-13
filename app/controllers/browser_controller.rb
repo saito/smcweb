@@ -29,13 +29,16 @@ class BrowserController < ApplicationController
   
   def view
     @root = root
-    @path = secure_path
-
+    @path = secure_path(@path, !params[:create])
     if @path.directory?
       directory_index
     elsif @path.to_s =~ /\.smc$/
-      @headers["content-type"] = "text/plain; charset=utf-8"
-      render :text => File.new(@path).read
+      if params[:create]
+        redirect_to :action => :form, :path => @path, :create => params[:create]
+      else
+        @headers["content-type"] = "text/plain; charset=utf-8"
+        render :text => File.new(@path).read
+      end
     else
       sec = Time.now.tv_sec
       redirect_to "#{config['contents_root_uri'].to_s}/#{params['path'].to_s}?#{sec}"
@@ -44,14 +47,14 @@ class BrowserController < ApplicationController
   
   def menu
     @root = root
-    @path = secure_path
+    @path = secure_path(@path, !params[:create])
     @item = current_item
     @prohibit_editing = prohibit_editing
   end
   
   def form
     @root = root
-    @path = secure_path(@path, false)
+    @path = secure_path(@path, !params[:create])
     @item = current_item
 
     if @item.type == :smc && @path.exist?
@@ -192,9 +195,8 @@ class BrowserController < ApplicationController
   end
   
   def new
-    @root = root
-    path = secure_path + params[:name]
-    redirect_to :action => :form, :path => path
+    path = Pathname.new(params[:path]) + params[:name]
+    redirect_to :action => :main, :path => path.to_s, :create => true
   end
 
 private
