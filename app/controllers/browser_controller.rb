@@ -16,6 +16,9 @@ class BrowserController < ApplicationController
   def tree
     @root = root
     @path = secure_path
+    if !@path.directory?
+      @path = @path.parent
+    end
   end
   
   def tree_json
@@ -34,7 +37,8 @@ class BrowserController < ApplicationController
       @headers["content-type"] = "text/plain; charset=utf-8"
       render :text => File.new(@path).read
     else
-      redirect_to "#{config['contents_root_uri'].to_s}/#{params['path'].to_s}"
+      sec = Time.now.tv_sec
+      redirect_to "#{config['contents_root_uri'].to_s}/#{params['path'].to_s}?#{sec}"
     end
   end
   
@@ -49,13 +53,16 @@ class BrowserController < ApplicationController
     @path = secure_path
     @item = current_item
 
-    loader = SmallCage::Loader.new(@path)
-    dir_conf = loader.load(@path);
-    editor = dir_conf["dirs"].last["editor"]
-    unless editor.nil?
-      redirect_to :controller => "editor", :action => "index", :type => editor, :target => @path.basename
-      return;
+    if @item.type == :smc
+      loader = SmallCage::Loader.new(@path)
+      obj = loader.load(@path);
+      editor = obj["dirs"].last["editor"]
+      unless editor.nil?
+        redirect_to :controller => "editor", :action => "index", :type => editor, :target => @path.basename
+        return
+      end
     end
+
 
     if @form.nil?
       @form = SimpleEditor.new
@@ -85,7 +92,6 @@ class BrowserController < ApplicationController
   def upload
     @root = root
     @path = secure_path
-
     if @path.directory?
       upload_into_directory
     else
@@ -148,16 +154,16 @@ class BrowserController < ApplicationController
     @root = root
     @path = secure_path
     @item = current_item
-    
+
     if @item.type == :smc || @item.type == :directory
       runner = SmallCage::Runner.new({:path => @path })
       runner.update
     else
       redirect_to :action => :main, :path => params[:path]
     end 
-    
+
     if @item.type == :smc
-      redirect_to :action => :main, :path => params[:path][0...-4]
+      redirect_to :action => :main, :path => params[:path]
     else
       if (@path + "index.html").exist?
         redirect_to :action => :main, :path => (Pathname.new(params[:path].to_s) + "index.html").to_s

@@ -36,9 +36,8 @@
 
 <script type="text/javascript">
 
-
 var data= [{
-"label":"(root)",
+"label":"(<%= (@path == @root) ? "root" : @path.basename %>)",
 ".":<%= render_partial "json" %>,
 "open":true,
 "collapse":"all_children",
