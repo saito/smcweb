@@ -1,3 +1,7 @@
+body {
+	margin: 0px;
+	padding: 6px;
+}
 
 form {
 	margin: 0px;
@@ -47,4 +51,32 @@ form {
 
 #tools input {
 	font-size: x-small;
+}
+
+
+/* generic form */
+#genericForm {
+	margin:12px;
+	width: 95%;
+	text-align:right;
+}
+
+#genericForm #bodyText {
+	padding-bottom: 24px;
+}
+
+#genericForm #bodyText textarea {
+	width: 100%;
+}
+
+#genericForm .label {
+	float:left;
+	font-size: small;
+	font-weight: bold;
+}
+
+#genericForm .controlForm {
+	margin-top: 30px;
+	padding-top: 6px;
+	border-top: 1px solid #999999;
 }

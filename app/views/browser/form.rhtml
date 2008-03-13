@@ -14,24 +14,29 @@
 </head>
 <body>
 
+<div id="genericForm">
+
 <%- if @item.text_editable -%>
 <div id="bodyText">
 <% form_tag({:action => 'save'}, {:name=>'simpleEditor'}) do %>
   <%= text_area :form, :body, :size=> "80x20" %>
   <%= hidden_field_tag "path",  params[:path] %>
-  <div class="submit"><%= submit_tag 'Save' %></div>
+  <div class="submit"><%= submit_tag 'Save this text' %></div>
 <% end %>
 </div>
 <%- end -%>
 
-<div id="renameForm">
+
+<div class="controlForm">
+<div class="label">Rename this file to:</div>
 <% form_tag({:action => "rename"}, {:target => "_parent"}) do %>
   <%= hidden_field_tag "path",  params[:path] %>
-  <%= text_field :form, :file_name, :size=> 50 %><%= submit_tag 'Rename' %>
+  <%= text_field :form, :file_name, :size=> 50 %> <%= submit_tag 'Rename' %>
 <% end %>
 </div>
 
-<div id="uploadForm">
+<div class="controlForm">
+<div class="label">Replace this file with:</div>
 <% form_tag({:action => "upload"}, {:multipart => true, :target=>"_parent"}) do %>
   <%= hidden_field_tag "path", params[:path] %>
   <%= file_field_tag "upload_file", :size=>50 %>
@@ -40,18 +45,22 @@
 </div>
 
 
-<div id="deleteForm">
+<div class="controlForm">
+<div class="label">Delete this file:</div>
 <% form_tag({:action => "delete"}, {:target => "_parent"}) do %>
   <%= hidden_field_tag "path",  params[:path] %>
-  <%= submit_tag  "Delete" %>
+  <%= submit_tag  "Delete", :onclick => "return #{confirm_javascript_function("このファイルを削除します。よろしいですか？") }" %>
 <% end %>
 </div>
 
 <%- if @item.type == :image -%>
-<div style="margin-top:0.5em;">
+<div class="imagePreview">
 <img src="<%= @item.uri %>?<%= Time.now.tv_sec %>">
 </div>
 <%- end -%>
+
+
+</div>
 
 </body>
 </html>
