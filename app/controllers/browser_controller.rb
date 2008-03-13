@@ -51,10 +51,10 @@ class BrowserController < ApplicationController
   
   def form
     @root = root
-    @path = secure_path
+    @path = secure_path(@path, false)
     @item = current_item
 
-    if @item.type == :smc
+    if @item.type == :smc && @path.exist?
       loader = SmallCage::Loader.new(@path)
       obj = loader.load(@path);
       editor = obj["dirs"].last["editor"]
@@ -64,10 +64,9 @@ class BrowserController < ApplicationController
       end
     end
 
-
     if @form.nil?
       @form = SimpleEditor.new
-      @form.body = File.new(@path).read
+      @form.body = File.new(@path).read if @path.exist?
       @form.file_name = @path.basename
     end
   end
@@ -75,9 +74,9 @@ class BrowserController < ApplicationController
   def save
     @form = SimpleEditor.new(params, :form)
     @root = root
-    @path = secure_path
+    @path = secure_path(@path, false)
     @item = current_item
-    
+
     open(@path, "w") do |io|
       io << @form.body
     end
@@ -172,6 +171,30 @@ class BrowserController < ApplicationController
         redirect_to :action => :main, :path => params[:path].to_s
       end
     end
+  end
+
+  def create_or_delete_directory
+    @root = root
+    @path = secure_path
+    target = @path + params[:name]
+    if params[:commit] == "Create new directory"
+      if !params[:name].empty?
+        target.mkdir
+      end
+    elsif params[:commit] == "Delete this directory"
+      if target.exist? && target.children.length == 0
+        target.rmdir
+      end
+      redirect_to :action => :main, :path => Pathname.new(params[:path]).parent.to_s
+      return;
+    end
+    redirect_to :action => :main, :path => params[:path].to_s
+  end
+  
+  def new
+    @root = root
+    path = secure_path + params[:name]
+    redirect_to :action => :form, :path => path
   end
 
 private

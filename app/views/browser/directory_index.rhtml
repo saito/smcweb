@@ -14,11 +14,46 @@
 </head>
 <body>
 
-<% form_tag({:action => "upload"}, {:multipart => true, :target=>"_parent"}) do %>
-    <%= hidden_field_tag "path", params[:path] %>
-    <%= file_field_tag "upload_file", {:size => 50} %>
-    <%= submit_tag  "Upload" %>
+<div id="tools">
+<table border="0" cellpadding="0" cellspacing="0">
+<% form_tag({:action => "create_or_delete_directory"}, {:target=>"_parent"}) do %>
+<tr>
+<td style="padding-right:12px">
+  <%= hidden_field_tag "path", params[:path] %>
+  <%= text_field_tag "name", "", :size => 50 %>
+</td>
+<td>
+  <%= submit_tag  "Create new directory" %>
+  <% if @items.to_a.length == 0 %>
+  <%= submit_tag  "Delete this directory", :onclick => "return #{confirm_javascript_function("削除します。よろしいですか？") }" %>
+  <% end %>
+</td>
+</tr>
 <% end %>
+<% form_tag({:action => "new"}) do %>
+<tr>
+<td style="padding-top:6px; padding-right:12px">
+  <%= hidden_field_tag "path", params[:path] %>
+  <%= text_field_tag "name", "", :size => 50 %>
+</td>
+<td>
+  <%= submit_tag  "Create new File" %>
+</td>
+</tr>
+<% end %>
+<% form_tag({:action => "upload"}, {:multipart => true, :target=>"_parent"}) do %>
+<tr>
+<td style="padding-top:6px; padding-right:12px">
+  <%= hidden_field_tag "path", params[:path] %>
+  <%= file_field_tag "upload_file", {:size => 50} %>
+</td>
+<td>
+  <%= submit_tag  "Upload file" %>
+</td>
+</tr>
+<% end %>
+</table>
+</div>
 
 <%= @items.to_a.length %> files:
 <table>
