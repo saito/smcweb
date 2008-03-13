@@ -14,7 +14,7 @@
 </head>
 
 <frameset rows="66,*" border="1">
-    <frame src="<%= url_for :action => :menu, :path => params['path'], :create => params['create'] %>" name="menu">
+    <frame src="<%= url_for :action => :menu, :path => params['path'], :create => params['create'] %>" scrolling="no" name="menu">
     <frame src="<%= url_for :action => :view, :path => params['path'], :create => params['create'] %>" name="view">
 </frameset>
 
