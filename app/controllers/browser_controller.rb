@@ -199,6 +199,30 @@ class BrowserController < ApplicationController
     redirect_to :action => :main, :path => path.to_s, :create => true
   end
 
+  def sync
+    @result = ""
+    command = config["sync_command"]
+    return if command.nil?
+
+    path = (params[:path].nil?) ? "" : params[:path]
+
+    root_dir = root
+    path_dir = Pathname.new(path)
+    sources = root_dir + path_dir
+    target = path_dir
+    if sources.file?
+      sources = sources.parent
+      target = target.parent
+    end
+    sources = sources.cleanpath
+    target = target.cleanpath
+
+    open("| #{command} #{sources} #{target}") do |io|
+      @result += io.read
+    end
+    @command = command
+  end
+
 private
 
   def current_item

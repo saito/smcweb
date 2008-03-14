@@ -15,6 +15,13 @@
 </head>
 
 <body>
+<%- if @item.type == :directory || @item.type == :smc -%>
+<%- if !@config["sync_command"].nil? -%>
+<div style="float:right">
+<%= link_to("[ Sync ]", { :action => "sync", :path => params["path"] }, :target=> "view", :onclick => "return #{confirm_javascript_function("このディレクトリ以下を本番サイトに送信します。よろしいですか？") }") %>
+</div>
+<%- end -%>
+<%- end -%>
 
 <table border="0">
 <tbody>
