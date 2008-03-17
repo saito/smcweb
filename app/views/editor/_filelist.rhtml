@@ -8,10 +8,13 @@
 <% if local_conf["use_multiple_delete"] == true %>
 
   <% form_tag({:action => "delete_multiple"}) do %>
+  <table border="0">
   <% @files.reverse.each do |f| %>
-  <div style="margin-bottom:6px;">
-    <%= check_box_tag "targets[]", f.basename %>
-    &nbsp;
+  <tr>
+
+    <td valign="top"><%= check_box_tag "targets[]", f.basename %></td>
+
+    <td style="text-align:top; padding-bottom:6px;">
     <a href="<%= @config["uri_prefix"] %>/editor/index?target=<%=h f.basename %>">
 	<% if local_conf["labels"].nil? %>
 	  <%=h f.basename %>
@@ -21,8 +24,11 @@
 	   <% end %>
 	<% end %>
     </a>
-  </div>
+    </td>
+
+  </tr>
   <% end %>
+  </table>
   <%= submit_tag "削除", :onclick => "return #{confirm_javascript_function("チェックした項目を削除します。よろしいですか？") }" %>
   <% end %>
 
