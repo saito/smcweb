@@ -1,8 +1,9 @@
 <%= javascript_include_tag :defaults %>
 <%- if contains_typ("tinymce") -%>
 <script language="javascript" type="text/javascript" src="<%= @config["static_prefix"] %>/js/tiny_mce/tiny_mce.js"></script>
-<%- @fields.each do |f| -%>
 <script language="javascript" type="text/javascript">
+<%- @fields.each do |f| -%>
+<%- if f.typ == "tinymce" -%>
 tinyMCE.init({
 	mode : "textareas",
 	editor_selector : "tinymce_<%= f.name %>",
@@ -18,13 +19,22 @@ tinyMCE.init({
 	theme_advanced_toolbar_align : "left",
 	theme_advanced_statusbar_location : "bottom"
 });
-</script>
 <%- end -%>
+<%- end -%>
+</script>
 <%- end -%>
 
 <%- if contains_typ("date") -%>
-<script type="text/javascript" src="<%= @config["static_prefix"] %>/js/editor/protocalendar.js"></script>
-<link rel="stylesheet" type="text/css" href="<%= @config["static_prefix"] %>/css/simple.css" />
+<link rel="stylesheet" type="text/css" href="<%= @config["static_prefix"] %>/js/protocalendar/stylesheets/simple.css" />
+<script type="text/javascript" src="<%= @config["static_prefix"] %>/js/protocalendar/javascripts/protocalendar.js"></script>
+<script type="text/javascript">
+SmcDateField = new Object();
+SmcDateField.inputNow = function(id, format) {
+  var e = $(id);
+  var df = new ProtoCalendar.DateFormat(format);
+  e.value = df.format(new Date());
+};
+</script>
 <%- end -%>
 
 <%- if filename_override? -%>
