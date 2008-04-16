@@ -1,0 +1,21 @@
+protocalendar.js
+
+License : MIT-style license.
+Web site: http://labs.spookies.jp
+
+
+*prototype.js ベース（1.5 or later）。
+*シンプルで軽量な日時選択 javascript ライブラリ。
+*16のローカライゼーションに対応。
+*フォーカスでカレンダー表示。（トリガーを追加可能）
+*日付フォーマットを変更可能。
+*日付のラベル表示が可能。（フォーマットも変更可能）
+*年・月を直接変更可能。（年選択時に前後指定年数を表示）
+*カレンダーの開始曜日を変更可能。
+*祝日完全対応。（カスタマイズ可能）
+*「今日」、「明日」、「明後日」などの任意の文字入力にも対応。（カスタマイズ可能）
+*いくつかの標準スタイルを用意。（paper, metal などの画像、 css も MIT license）
+*effects.js と組み合わせて effect に対応。
+*クロスブラウザ （IE6 以降, Firefox2 以降, Safari2 以降, Opera9 以降）
+*IE の z-index バグに対応。(http://support.microsoft.com/kb/177378)
+
