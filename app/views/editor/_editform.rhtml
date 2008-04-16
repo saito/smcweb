@@ -9,17 +9,17 @@
 
 <table>
 
-<%- if !@config["file_name"].nil? && @config["file_name"]["hidden"] == true -%>
+<%- if filename_override? -%>
 <%= hidden_field_tag "target", @target %>
-<% else %>
+<%- else -%>
 <tr>
 <td>File</td>
 <td><%= text_field_tag "target", @target, :size=>60 %></td>
 </tr>
 <%- end -%>
-<% if !@is_new %>
+<%- unless @is_new -%>
 <%= hidden_field_tag "target_original", @target %>
-<% end %>
+<%- end -%>
 
 <%- 
 @fields.each do |f|
@@ -28,8 +28,6 @@
 <tr>
 <td nowrap="yes"><%=h f.label %>&nbsp;&nbsp;</td>
 <td>
-
-
 
 <%- if f.typ == "text" -%>
 
@@ -50,17 +48,24 @@
 <%- elsif f.typ == "date" -%>
 
   <%= text_field "form", "field_" + f.name, f.options.nil? ? {:size => 20 } : f.options %>
+  <a href="javascript:SmcDateField.inputNow('form_field_<%= f.name %>', '<%= f.options["format"] %>')">Now</span>
   <script type="text/javascript">
   InputCalendar.createOnLoaded(
-    "<%= f.options["id"] %>",
+    "form_field_<%= f.name %>",
 	{
 		format: "<%= f.options["format"] %>"
+		<% if f.options["format"] =~ /H/i %>
+		, enableHourMinute: true
+		<% end %>
+		<% if f.options["format"] =~ /s/i %>
+		, enableSecond: true
+		<% end %>
 	}
   );
+  
   </script>
 
 <%- end -%>
-
 
 </td>
 </tr>
@@ -82,7 +87,7 @@
 <% if "date" == @config["filename_override"]["type"] %>
 function setFilename() {
   var target = document.smcForm.target;
-  var input = $("<%= @config["filename_override"]["id"] %>");
+  var input = $("form_field_<%= @config["filename_override"]["name"] %>");
   if (input.value == null) {
     return;
   }
