@@ -1,8 +1,8 @@
 module EditorHelper
 
-  def contains_typ(typ)
+  def contains_type(type)
     @fields.each do |f|
-      if f.typ == typ
+      if f.field_type == type
         return true
       end
     end
