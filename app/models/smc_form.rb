@@ -1,31 +1,37 @@
 class SmcForm
   # require 'yaml/encoding'
-  attr_accessor :values
+  attr_accessor :values, :path_args
 
   def initialize(fields)
     @fields = fields
     @fields_hash = {}
+    @path_fields = []
     @fields.each do |f|
-      @fields_hash[f.name] = f
+      if f.path?
+        @path_fields[f.path_index] = f
+      else
+        @fields_hash[f.name] = f
+      end
     end
     @values = {}
+    @path_args = []
   end
   
   def params=(params)
     @values = {}
     params.each do |k,v|
-      next if k !~ /^field_(.+)$/ || ! @fields_hash.key?($1)
-      k = $1
-      if @fields_hash[k].typ == "array"
-        @values[k] = v.split(/\r\n|\r|\n/)
-      else
-        @values[k] = v
+      if k =~ /^field_(.+)$/ && @fields_hash.key?($1)
+        k = $1
+        if @fields_hash[k].field_type == "array"
+          @values[k] = v.split(/\r\n|\r|\n/)
+        else
+          @values[k] = v
+        end
+      elsif k =~ /^path_(\d+)$/ && ! @path_fields[$1.to_i].nil?
+        k = $1
+        @path_args[k.to_i] = v
       end
     end
-  end
-  
-  def values=(values)
-    @values = values
   end
   
   def to_yaml
@@ -68,36 +74,61 @@ class SmcForm
   end
   
   def method_missing(name, *args)
-    unless name.to_s =~ /^field_(.+)$/
-      raise NameError.new("undefined method `#{name}' for SmcForm")
-    end
-  
-    field_name = $1
-    setter = false
-    if field_name =~ /=$/
-      field_name = field_name[0...-1]
-      setter = true
-    end
-    return nil unless @fields_hash.key?(field_name)
-    
-    field = @fields_hash[field_name]
-    if setter
-      v = args[0]
-      if v.nil?
-        return @values[field_name] = nil
-      end
-      if field.typ == "array"
-        return @values[field_name] = v.split(/\r\n|\r|\n/)
+    name = name.to_s
+    setter = name.ends_with?("=")
+    name = name[0...-1] if setter
+
+    if name.to_s =~ /^field_(.+)$/
+      name = $1
+      if setter
+        return set_field_value_from_form(name, args[0])
       else
-        return @values[field_name] = v
+        return get_field_value_for_form(name)
+      end
+    elsif name.to_s =~ /^path_(\d+)$/
+      index = $1.to_i
+      if setter
+        return set_path_arg_from_form(index, args[0])
+      else
+        return @path_args[index]
       end
     else
-      if field.typ == "array"
-        return nil if @values[field_name].nil?
-        return @values[field_name].join("\n")
-      else
-        return @values[field_name]
-      end
+      raise NameError.new("undefined method `#{name}' for SmcForm")
     end
   end
+
+  
+  def set_field_value_from_form(name, value)
+    field = @fields_hash[name]
+    return nil if field.nil?
+    if value.nil?
+      return @values[name] = nil
+    end
+    if field.field_type == "array"
+      return @values[name] = value.split(/\r\n|\r|\n/)
+    else
+      return @values[name] = value
+    end
+  end
+  private :set_field_value_from_form
+  
+  def get_field_value_for_form(name)
+    field = @fields_hash[name]
+    return nil if field.nil?
+    if field.field_type == "array"
+      return nil if @values[name].nil?
+      return @values[name].join("\n")
+    else
+      return @values[name]
+    end
+  end
+  private :get_field_value_for_form
+  
+  def set_path_arg_from_form(index, value)
+    field = @path_fields[index]
+    return nil if field.nil?
+    @path_args[index] = value
+  end
+  private :set_path_arg_from_form
+  
 end
