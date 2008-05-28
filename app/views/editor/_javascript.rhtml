@@ -1,9 +1,9 @@
 <%= javascript_include_tag :defaults %>
-<%- if contains_typ("tinymce") -%>
+<%- if contains_type("tinymce") -%>
 <script language="javascript" type="text/javascript" src="<%= @config["static_prefix"] %>/js/tiny_mce/tiny_mce.js"></script>
 <script language="javascript" type="text/javascript">
 <%- @fields.each do |f| -%>
-<%- if f.typ == "tinymce" -%>
+<%- if f.field_type == "tinymce" -%>
 tinyMCE.init({
 	mode : "textareas",
 	editor_selector : "tinymce_<%= f.name %>",
@@ -24,7 +24,7 @@ tinyMCE.init({
 </script>
 <%- end -%>
 
-<%- if contains_typ("date") -%>
+<%- if contains_type("date") -%>
 <link rel="stylesheet" type="text/css" href="<%= @config["static_prefix"] %>/js/protocalendar/stylesheets/simple.css" />
 <script type="text/javascript" src="<%= @config["static_prefix"] %>/js/protocalendar/javascripts/protocalendar.js"></script>
 <script type="text/javascript">

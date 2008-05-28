@@ -1,7 +1,7 @@
 <form method="post" action="<%= @config["uri_prefix"] %>/editor/save_or_delete" name="smcForm" onsubmit="setFilename();">
 <%- @fields.each do |f| -%>
-<%- if f.typ == "hidden" -%>
-<%= hidden_field "form", "field_" + f.name %>
+<%- if f.field_type == "hidden" -%>
+<%= hidden_field "form", f.html_input_name %>
 <%- end -%>
 <%- end -%>
 
@@ -9,53 +9,47 @@
 
 <table>
 
-<%- if filename_override? -%>
-<%= hidden_field_tag "target", @target %>
-<%- else -%>
-<tr>
-<td>File</td>
-<td><%= text_field_tag "target", @target, :size=>60 %></td>
-</tr>
-<%- end -%>
 <%- unless @is_new -%>
 <%= hidden_field_tag "target_original", @target %>
 <%- end -%>
 
 <%- 
 @fields.each do |f|
-    next if f.typ == "hidden"
+    next if f.field_type == "hidden"
+    fname = f.html_input_name
+    
 -%>
 <tr>
 <td nowrap="yes"><%=h f.label %>&nbsp;&nbsp;</td>
 <td>
 
-<%- if f.typ == "text" -%>
+<%- if f.field_type == "text" -%>
 
-  <%= text_field "form", "field_" + f.name, f.options.nil? ? {:size => 60 } : f.options %>
+  <%= text_field "form", fname, f.options.nil? ? {:size => 60 } : f.options %>
 
-<%- elsif f.typ == "checkbox" -%>
+<%- elsif f.field_type == "checkbox" -%>
 
-  <%= check_box "form", "field_" + f.name, f.options.nil? ? {} : f.options %>
+  <%= check_box "form", fname, f.options.nil? ? {} : f.options %>
 
-<%- elsif f.typ == "textarea" -%>
+<%- elsif f.field_type == "textarea" -%>
 
-  <%= text_area "form", "field_" + f.name, f.options.nil? ? {:size => "60x20"} : f.options %>
+  <%= text_area "form", fname, f.options.nil? ? {:size => "60x20"} : f.options %>
 
-<%- elsif f.typ == "tinymce" -%>
+<%- elsif f.field_type == "tinymce" -%>
 
-  <%= text_area "form", "field_" + f.name, (f.options.nil? ? {:size => "60x20"} : f.options.dup).merge({:class => "tinymce_#{f.name}"}) %>
+  <%= text_area "form", fname, (f.options.nil? ? {:size => "60x20"} : f.options.dup).merge({:class => "tinymce_#{f.name}"}) %>
 
-<%- elsif f.typ == "array" -%>
+<%- elsif f.field_type == "array" -%>
 
-  <%= text_area "form", "field_" + f.name, f.options.nil? ? {:size => "60x20"} : f.options %>
+  <%= text_area "form", fname, f.options.nil? ? {:size => "60x20"} : f.options %>
 
-<%- elsif f.typ == "date" -%>
+<%- elsif f.field_type == "date" -%>
 
-  <%= text_field "form", "field_" + f.name, f.options.nil? ? {:size => 20 } : f.options %>
-  <a href="javascript:SmcDateField.inputNow('form_field_<%= f.name %>', '<%= f.options["format"] %>')">Now</span>
+  <%= text_field "form", fname, f.options.nil? ? {:size => 20 } : f.options %>
+  <a href="javascript:SmcDateField.inputNow('form_<%= f.html_input_name %>', '<%= f.options["format"] %>')">Now</span>
   <script type="text/javascript">
   InputCalendar.createOnLoaded(
-    "form_field_<%= f.name %>",
+    "form_<%= f.html_input_name %>",
 	{
 		format: "<%= f.options["format"] %>"
 		<% if f.options["format"] =~ /H/i %>
@@ -85,21 +79,3 @@
 </table>
 
 </form>
-
-<%- if filename_override? -%>
-<%- if "date" == @config["filename_override"]["type"] -%>
-<script type="text/javascript">
-function setFilename() {
-  var target = document.smcForm.target;
-  var input = $("form_field_<%= @config["filename_override"]["name"] %>");
-  if (input.value == null) {
-    return;
-  }
-  var df = new SimpleDateFormat("<%= @config["filename_override"]["input_pattern"] %>");
-  var date = df.parse(input.value);
-  var df2 = new SimpleDateFormat("<%= @config["filename_override"]["output_pattern"] %>")
-  target.value = df2.format(date);
-}
-</script>
-<%- end -%>
-<%- end -%>
