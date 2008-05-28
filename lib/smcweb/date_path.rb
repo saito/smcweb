@@ -28,10 +28,10 @@ module Smcweb
     }
   
     def initialize(conf, override = {})
-      @root = config["root"]
+      @root = conf["root"]
       pconf = {}
       if conf["path"].is_a?(String)
-        pconf = parse_string_path_config
+        pconf = parse_string_path_config(conf["path"])
       else
         pconf = conf["path"]
       end
@@ -64,7 +64,8 @@ module Smcweb
     end
     
     def _new_path(t)
-      path = @target_root + t.strftime(@fname_format)
+      fname = @prefix + t.strftime(@fname_format) + @suffix
+      path = @target_root + fname
       return path unless path.exist?
 
       if @increment == "year"

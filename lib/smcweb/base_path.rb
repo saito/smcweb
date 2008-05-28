@@ -20,7 +20,7 @@ module Smcweb
       postmatch = $'
 
       # suffix can't include "/"
-      throw Exception.new("Illegal string path config:" + str) if postmatch.include("/")
+      throw Exception.new("Illegal string path config:" + str) if postmatch.include?("/")
       result["suffix"] = postmatch
       
       prematch =~ %r{(.*)/([^/]*)}
