@@ -113,7 +113,7 @@ module Smcweb
       Dir.foreach(@target_root) do |fname|
         date = fname_to_date(fname)
         unless date.nil?
-          result << @target_root + f
+          result << @target_root + fname
         end
       end
       return result
