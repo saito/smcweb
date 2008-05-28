@@ -1,26 +1,38 @@
 class EditorController < ApplicationController
+  require 'smallcage'
 
   before_filter :read_config_filter
   attr_reader :config
   layout "default"
   
-#  require 'pp'
-  require 'smallcage'
+  def test
+    p @path.new_path
+    render :text => "OK"
+  end
 
   def index
-    @files = get_files
-    @target_file = get_target_file(true)
-    @target_file ||= new_target_file
-    @target = relpath(@target_file)
-    @is_new = params[:target].nil?
-
+    @files = @path.list
+    @target_file = @path.args_to_path(params_to_path_args)
+    @target_file ||= @path.new_path
+    
     init_fields
-    init_form
+    init_form_values
     render_form
   end
   
+  def params_to_path_args
+    result = []
+    return result if params["form"].nil?
+
+    params["form"].keys.sort.each do |k|
+      result << params["form"][k] if k =~ /^path_\d+$/
+    end
+    return result
+  end
+  private :params_to_path_args
+
   def save_or_delete
-    if params[:submit] == "保存"
+    if params[:submit] == "保存" # TODO 日本語
       save
     elsif params[:submit] == "削除"
       delete
@@ -28,33 +40,31 @@ class EditorController < ApplicationController
   end
 
   def save
-    @files = get_files
-    @target_file = get_target_file(false)
+    @target_file = @path.args_to_path(params_to_path_args)
     if @target_file.nil?
       render :text => "ERROR: Illegal file name."
-      return;
+      return
     end
 
     # (新規 || リネーム) && 重複 -> ファイル名再発番
-    if ((params[:target_original].nil? || params[:target] != params[:target_original]) && @target_file.file?)
-      file_name = resolve_file_name(@target_file.basename.to_s)
-      @target_file = @target_file.parent.join(file_name)
-    end
-
-    @target = relpath(@target_file)
+    # if ((params[:target_original].nil? || params[:target] != params[:target_original]) && @target_file.file?)
+    #   file_name = resolve_file_name(@target_file.basename.to_s)
+    #   @target_file = @target_file.parent.join(file_name)
+    # end
+    # @target = relpath(@target_file)
     
     init_fields
-    init_form(params)
+    init_form_values(params)
 
     yaml = @form.to_yaml
     File.open(@target_file, "w") do |io|
       io << yaml
     end
-    purge_old_file
+    # purge_old_file
     
     publish(@target_file)
 
-    @files = get_files
+    @files = @path.list
     render_form
   end
 
@@ -62,7 +72,7 @@ class EditorController < ApplicationController
     # ファイル名が変更された場合、旧ファイルを削除
     target_old = params[:target_original]
     if !target_old.nil? && target_old != params[:target]
-      file_old = get_target_file(true, target_old)
+      file_old = get_target_file(true, target_old) # XXX
       exec_delete(file_old) unless file_old.nil?
     end
   end
@@ -88,9 +98,6 @@ class EditorController < ApplicationController
     index
   end
 
-
-private  
-
   def publish(target_file)
     path = @config["publish"]
     if path.nil?
@@ -99,6 +106,7 @@ private
       publish_config_path(path, target_file)
     end
   end
+  private :publish
   
   def publish_config_path(path, target_file)
     if path.is_a?(Array)
@@ -121,24 +129,26 @@ private
     
     exec_publish(file)
   end
-
+  private :publish_config_path
+  
   def exec_publish(target_file)
     return if target_file.nil?
     runner = SmallCage::Runner.new({:path => target_file })
     runner.update
   end
-
+  private :exec_publish
 
   def exec_delete(file)
     File.delete(file)
     
-    if file.to_s =~ /.smc/
+    if file.to_s =~ /\.smc$/
       out_file = file.to_s[0...-4]
       if Pathname.new(out_file).file?
         File.delete(out_file)
       end
     end
   end
+  private :exec_delete
 
   def init_fields
     if ! form_config.nil?
@@ -149,85 +159,85 @@ private
       @fields = SmcField.create_from_sample(sample_obj)
     end
   end
+  private :init_fields
   
-  def init_form(params = nil)
+  def init_form_values(params = nil)
     @form = SmcForm.new(@fields)
+    
+    # values came from outside
     if ! params.nil?
       @form.params = params["form"]
-    elsif ! target_obj.nil?
-      @form.values = target_obj
-    elsif ! form_config.nil?
-      values = {}
+      return
+    end
+
+    # values came from inside
+    values = {}
+    if ! target_obj.nil? # YAML
+      values = target_obj
+    elsif ! form_config.nil? # default
       form_config.each do |c|
         values[c["name"]] = c["value"]
       end
-      @form.values = values
-    elsif ! sample_obj.nil?
-      @form.values = { "template" => sample_obj["template"] }
+    elsif ! sample_obj.nil? # auto
+      values = { "template" => sample_obj["template"] }
     end
     
-    if @form.field_template.nil?
-      @form.field_template = "default"
-    end
+    @form.values = values
+    @form.path_args = target_file_path_args
   end
+  private :init_form_values
+  
+  def target_file_path_args
+    return @path.path_to_args(@target_file)
+  end
+  private :target_file_path_args
 
   def new_target_file
     filename_template = Pathname.new(config["config_dir"]).join("filenames/" + config["filename_out"] + ".rhtml")
     erb = ERB.new(filename_template.read)
     return format_new_target_file(erb)
-  end  
+  end
+  private :new_target_file
 
   def format_new_target_file(erb)
     name = erb.result(binding)
     name = resolve_file_name(name)
     return get_source_file_path(name)
   end
+  private :format_new_target_file
 
   def resolve_file_name(name)
     @filename_retry = 0
-    # 同名ファイルが存在する場合"-n"を添付、"-n"が存在する場合は加算
     target = get_source_file_path(name)
     return name if !target.exist?
     if config["filename_retry"].to_s.empty? || config["filename_retry"].to_i < @filename_retry
       return target
     end
     @filename_retry += 1
-    
-    if name =~ /-\d+\./
-      result = increment_branch_number(name)
-    else
-      result = add_number_before_period(name)
-    end
+
+    # XXX
+    # if name =~ /-\d+\./
+    #   result = increment_branch_number(name)
+    # else
+    #   result = add_number_before_period(name)
+    # end
 
     return resolve_file_name(result)
   end
-
-  def increment_branch_number(name)
-    result = ""
-    /(.+)-(\d+)\.(.+)/ =~ name
-    num = $2.to_i + 1
-    return $1 + "-" + num.to_s + "." + $3
-  end
-
-  def add_number_before_period(name)
-    result = ""
-    tokens = name.split(".")
-    return name if tokens.size <= 1
-    tokens.each do |token|
-      if result.empty?
-        result += token + "-" + @filename_retry.to_s
-      else
-        result += "." + token
-      end
-    end
-    return result;
-  end
+  private :resolve_file_name
 
   def get_source_file_path(name)
     target = Pathname.new(config["source_dir"]).join(name)    
   end
+  private :get_source_file_path
 
-  def get_target_file(only_exists = false, name = nil)
+
+  def get_target_file(only_exists = false)
+  
+  end
+  private :get_target_file
+
+  def get_target_file_OLD(only_exists = false, name = nil)
     name = params["target"] if name.nil?
     return nil if name.nil?
     return nil unless valid_file_name?(name)
@@ -239,6 +249,7 @@ private
     end
     return result
   end
+  private :get_target_file_OLD
 
   def get_target_files(only_exists = false)
     names = params[:targets]
@@ -255,6 +266,7 @@ private
     end
     return files
   end
+  private :get_target_files
 
   def target_obj
     if @target_obj.nil?
@@ -263,6 +275,7 @@ private
     end
     return @target_obj
   end
+  private :target_obj
 
   def sample_obj
     if @sample_obj.nil?
@@ -272,6 +285,7 @@ private
     end
     return @sample_obj
   end
+  private :sample_obj
 
   def form_config
     if @form_config.nil?
@@ -279,6 +293,7 @@ private
     end
     return @form_config
   end
+  private :form_config
 
   def load_form_config
     name = config["form"]
@@ -290,44 +305,17 @@ private
     raise "form config must be array: " + file.to_s unless config.is_a?(Array)
 
     return config
-  end  
+  end
+  private :load_form_config
 
   def valid_file_name?(name)
     return name =~ config["filename_in"]
   end
-  
-  def get_files
-    dir = config["source_dir"]
-    result = []
-    Pathname.glob(dir.to_s + "/**/*") do |path|
-      rp = relpath(path)
-      next if rp.nil?
-      next unless valid_file_name?(rp.to_s)
-      result << path
-    end
-    return result.sort {|a,b| a.to_s <=> b.to_s }
-  end
+  private :valid_file_name?
 
   def render_form
-    layout = find_layout
-    if layout.nil?
-      render :action => :index
-    else
-      render(:file => layout, :use_full_path => false)
-    end
+    render :action => :index
   end
-
-  def find_layout
-    dir = config["site_config_dir"] + "forms"
-    return nil if (dir.nil?)
-
-    file_name = params[:type] + ".rhtml"
-    file_name = params[:type] + ".html.erb" unless (dir + file_name).file?
-
-    if (dir + file_name).file?
-      return (dir + file_name).to_s
-    end
-    return nil
-  end
+  private :render_form
 
 end
