@@ -37,7 +37,7 @@ module Smcweb
       end
       pconf = pconf.merge(override)
 
-      @target_root = @root + pconf["root"]
+      @target_root = @root + ("." + pconf["root"])
       @prefix = pconf["prefix"]
       @suffix = pconf["suffix"]
       
@@ -129,7 +129,7 @@ module Smcweb
     def path_to_args(path)
       return nil unless @target_root.realpath == path.parent.realpath
       
-      fname = path.basename
+      fname = path.basename.to_s
       date = fname_to_date(fname)
       return nil if date.nil?
     
