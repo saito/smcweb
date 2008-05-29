@@ -7,7 +7,14 @@ class ApplicationController < ActionController::Base
   
   MAX_ROOT_SEARCH = 30
   
-private  
+  def relpath(path)
+    return nil if path.nil?
+    root = config["root"].to_s
+    unless path.to_s[0...root.length] == root
+      return nil
+    end
+    return path.relative_path_from(config["root"])
+  end
 
   def read_config_filter
     site = params[:site].to_s
@@ -22,6 +29,7 @@ private
     @path = create_path_config(config)
     return true
   end
+  private :read_config_filter
 
   def read_site_config_filter
     site = params[:site].to_s
@@ -33,16 +41,8 @@ private
     end
     return true
   end
+  private :read_site_config_filter
   
-  def relpath(path)
-    return nil if path.nil?
-    root = config["root"].to_s
-    unless path.to_s[0...root.length] == root
-      return nil
-    end
-    return path.relative_path_from(config["root"])
-  end
-
   def load_yaml_as_hash(file)
     docs = YAML.load_stream(File.read(file)).documents
 
@@ -70,6 +70,7 @@ private
     
     return result    
   end
+  private :load_yaml_as_hash
 
   def read_site_config(site)
     return nil unless site =~ /^[-\w]+$/ 
@@ -88,6 +89,7 @@ private
     
     return site_config
   end
+  private :read_site_config
 
   def read_config(site, type)
     site_config = read_site_config(site)
@@ -106,6 +108,7 @@ private
     
     return config
   end
+  private :read_config
 
   def create_path_config(config)
     path_class = nil
@@ -144,5 +147,6 @@ private
     
     return nil
   end
+  private :search_document_root
 
 end

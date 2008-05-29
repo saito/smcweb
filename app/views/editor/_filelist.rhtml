@@ -12,16 +12,20 @@
   <% @files.reverse.each do |f| %>
   <tr>
 
-    <td valign="top"><%= check_box_tag "targets[]", f.basename %></td>
+    <td valign="top"><%= check_box_tag "targets[]", controller.relpath(f) %></td>
 
     <td style="text-align:top; padding-bottom:6px;">
-    <a href="<%= @config["uri_prefix"] %>/editor/index?target=<%=h f.basename %>">
+    <a href="<%= @config["uri_prefix"] %>/editor/index?target=<%= controller.relpath(f) %>">
 	<% if local_conf["labels"].nil? %>
 	  <%=h f.basename %>
 	<% else %>
-	   <% local_conf["labels"].each do |label| %>
-	   <%= get_content(f, label) %> 
-	   <% end %>
+	  <% local_conf["labels"].each do |label| %>
+	    <% if label.is_a?(Symbol) && label.to_s =~ /^path_(\d+)$/ %>
+	      <%= @path.path_to_args(f)[$1.to_i] %>
+	    <% else %>
+  	      <%= get_content(f, label) %> 
+        <% end %>
+      <% end %>
 	<% end %>
     </a>
     </td>

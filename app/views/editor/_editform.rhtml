@@ -9,8 +9,8 @@
 
 <table>
 
-<%- unless @is_new -%>
-<%= hidden_field_tag "target_original", @target %>
+<%- if @target_original -%>
+<%= hidden_field_tag "target_original", @target_original %>
 <%- end -%>
 
 <%- 
