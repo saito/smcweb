@@ -100,7 +100,7 @@ class ApplicationController < ActionController::Base
     type_config_path = site_config["site_config_dir"] + "#{type}.yml"
     return nil unless type_config_path.file?
     
-    docs = YAML.load_stream(ERB.new(type_config_path.read).result(binding)).documents
+    docs = YAML.load_stream(type_config_path.read).documents
     type_config = docs[0]
     description = docs[1]
     config = type_config.merge(site_config)
