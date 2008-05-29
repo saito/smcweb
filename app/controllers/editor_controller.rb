@@ -22,10 +22,14 @@ class EditorController < ApplicationController
   def init_target(create_new = false)
     path_args = params_to_path_args
     @target_file = @path.args_to_path(path_args.to_a)
-    return if @target_file.nil? && ! create_new
-    
-    @target_file ||= @path.new_path
-    init_target_original
+    if @target_file.nil? && create_new
+      @target_file = @path.new_path
+    end
+
+    unless @target_file.nil?
+      @target = relpath(@target_file)
+      init_target_original
+    end
   end
   private :init_target
   
