@@ -72,7 +72,7 @@ module Smcweb
         t = t >> 12
       elsif @increment == "month"
         t = t >> 1
-      elsif @increment == "date"
+      elsif @increment == "day"
         t = t + 1
       elsif @increment == "hour"
         t = t + Rational(1, 24)
@@ -91,6 +91,11 @@ module Smcweb
       return nil unless fname.ends_with?(@suffix)
       
       date = fname[@prefix.length .. @suffix.length * -1 - 1]
+
+      # need to check length.
+      # strptime ignore the trailing characters.
+      return nil if date.length != @length
+
       begin
         return DateTime.strptime(date, @fname_format)
       rescue
@@ -127,7 +132,11 @@ module Smcweb
     end
   
     def path_to_args(path)
-      return nil unless @target_root.realpath == path.parent.realpath
+      begin
+        return nil unless @target_root.realpath == path.parent.realpath
+      rescue
+        return nil
+      end
       
       fname = path.basename.to_s
       date = fname_to_date(fname)
