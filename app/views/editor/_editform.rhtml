@@ -1,4 +1,4 @@
-<form method="post" action="<%= @config["uri_prefix"] %>/editor/save_or_delete" name="smcForm" onsubmit="setFilename();">
+<form method="post" action="<%= @config["uri_prefix"] %>/editor/save_or_delete" name="smcForm">
 <%- @fields.each do |f| -%>
 <%- if f.field_type == "hidden" -%>
 <%= hidden_field "form", f.html_input_name %>

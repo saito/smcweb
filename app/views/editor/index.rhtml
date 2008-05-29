@@ -1,5 +1,4 @@
 <%= render(:partial => "javascript", :object=>@config) %>
-<%= javascript_include_tag :defaults %>
 
 <%= render_part("logo") %>
 
@@ -10,6 +9,7 @@
 <div id="main">
 <div id="container">
 <%= render_part("description") %>
+
 <%= render_part("editform") %>
 <hr />
 <%= render_part("filelist") %>
