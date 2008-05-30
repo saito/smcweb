@@ -30,10 +30,7 @@ module Smcweb
       num = @start
       last_file = list.last
       unless last_file.nil?
-        num = fname_to_number(last_file.fname)
-        if num.nil?
-          throw Exception.new("Illegal path name:" + last_file.to_s)
-        end
+        num = fname_to_number(last_file.basename.to_s)
         num = num.to_i + 1
         if @length < num.to_s.length
           return last_file
@@ -47,15 +44,17 @@ module Smcweb
       Dir.foreach(@target_root) do |fname|
         number = fname_to_number(fname)
         unless number.nil?
-          result << @target_root + number
+          path = args_to_path([number.to_s])
+          throw Exception.new("Illegal path name:" + fname) if path.nil?
+          result << path
         end
       end
-      return number.sort
+      return result.sort
     end
     
     def args_to_path(args)
       num = args[0]
-      return nil if num =~ /^\d+$/
+      return nil unless num =~ /^\d+$/
       num = num.to_i
       return nil if @length < num.to_s.length
       num = "%0#{@length}d" % num
@@ -82,7 +81,7 @@ module Smcweb
             
       number = fname_to_number(path.basename.to_s)
       
-      return [core]
+      return [number]
     end
     
   end
