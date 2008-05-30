@@ -121,7 +121,7 @@ module Smcweb
           result << @target_root + fname
         end
       end
-      return result
+      return result.sort
     end
     
     def args_to_path(args)
