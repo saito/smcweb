@@ -52,6 +52,7 @@ class ApplicationController < ActionController::Base
     docs.each do |doc|
       if doc.is_a? String
         if string_count == 0
+          result["strings_0"] = doc
           result["body"] = doc
         else
           result["strings_#{string_count}"] = doc

@@ -4,9 +4,9 @@ module Smcweb
       @root = config["root"]
       
       if config["path"].is_a? String
-        @path = @root + "." + config["path"]
+        @path = @root + ("." + config["path"])
       else
-        @path = @root + "." + config["path"]["root"]
+        @path = @root + ("." + config["path"]["root"])
       end
     end
   
