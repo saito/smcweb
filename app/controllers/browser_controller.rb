@@ -22,7 +22,7 @@ class BrowserController < ApplicationController
   end
   
   def tree_json
-    @headers["content-type"] = "text/javascript+json; charset=utf-8"
+    response.headers["content-type"] = "text/javascript+json; charset=utf-8"
     @root = root
     @path = secure_path
   end
@@ -36,7 +36,7 @@ class BrowserController < ApplicationController
       if params[:create]
         redirect_to :action => :form, :path => @path, :create => params[:create]
       else
-        @headers["content-type"] = "text/plain; charset=utf-8"
+        response.headers["content-type"] = "text/plain; charset=utf-8"
         render :text => File.new(@path).read
       end
     else
