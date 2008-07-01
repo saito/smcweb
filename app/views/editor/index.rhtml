@@ -8,10 +8,13 @@
 
 <div id="main">
 <div id="container">
-<%= render_part("description") %>
+
+<div id="description">
+<%= render :inline => @config["description"] %>
+</div>
 
 <%= render_part("editform") %>
-<hr />
+
 <%= render_part("filelist") %>
 </div>
 </div>

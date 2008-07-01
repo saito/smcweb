@@ -1,0 +1,39 @@
+<h3>添付</h3>
+
+<script type="text/javascript" src="<%= @config["static_prefix"] %>/js/swfupload/swfupload.js"></script>
+<script type="text/javascript" src="<%= @config["static_prefix"] %>/js/swfupload/ext/js/handlers.js"></script>
+<script type="text/javascript">
+var swfu;
+window.onload = function () {
+	swfu = new SWFUpload({
+		upload_url: "/upload",
+
+		file_size_limit : "2048",
+		file_types : "*",
+		file_types_description : "All Files",
+		file_upload_limit : "0",
+
+		file_queue_error_handler : fileQueueError,
+		file_dialog_complete_handler : fileDialogComplete,
+		upload_progress_handler : uploadProgress,
+		upload_error_handler : uploadError,
+		upload_success_handler : uploadSuccess,
+		upload_complete_handler : uploadComplete,
+
+		flash_url : "<%= @config["static_prefix"] %>/js/swfupload/swfupload_f9.swf",	// Relative to this file
+
+		custom_settings : {
+			upload_target : "divFileProgressContainer"
+		},
+				
+		debug: false
+	});
+};
+</script>
+
+<form>
+	<button id="btnBrowse" type="button" style="padding: 2px;" onclick="swfu.selectFiles(); this.blur();"><img src="<%= @config["static_prefix"] %>/js/swfupload/ext/images/page_white_add.png" style="padding-right: 3px; vertical-align: bottom;">添付ファイルを選択</button>
+</form>
+
+<div id="divFileProgressContainer" style="height: 75px;"></div>
+<div id="thumbnails"></div>
