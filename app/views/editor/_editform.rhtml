@@ -31,6 +31,10 @@
 
   <%= check_box "form", fname, f.options.nil? ? {} : f.options %>
 
+<%- elsif f.field_type == "select" -%>
+
+  <%= select "form", fname, f.options["values"] %>
+
 <%- elsif f.field_type == "textarea" -%>
 
   <%= text_area "form", fname, f.options.nil? ? {:size => "60x20"} : f.options %>
