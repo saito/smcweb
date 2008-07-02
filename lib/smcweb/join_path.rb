@@ -54,9 +54,6 @@ module Smcweb
     end
   
     def path_to_args(path)
-      p path
-      
-
       match = path.to_s.match(/#{@pattern}/)
       return nil unless match
       result = match.to_a
