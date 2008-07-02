@@ -164,9 +164,16 @@ class EditorController < ApplicationController
     unless path.is_a?(String)
       raise "Path is not a String:" + path.to_s
     end
+    
+    raise "Illegal publish path:" + path if path =~ %r{/\.\./}
+    if path[0] == ?.
+      return if target_file.nil?
+      file = target_file.parent + path
+    else
+      raise "Illegal publish path:" + path unless path[0] == ?/  
+      file = @config["root"].join("." + path)
+    end
 
-    raise "Illegal publish path:" + path unless path[0] == ?/ || path =~ %r{/\.\./}
-    file = @config["root"].join("." + path)
     raise "Illegal publish path:" + path unless file.exist?
     
     exec_publish(file)
