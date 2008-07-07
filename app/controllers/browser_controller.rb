@@ -176,22 +176,25 @@ class BrowserController < ApplicationController
     end
   end
 
-  def create_or_delete_directory
+  def create_directory
     @root = root
     @path = secure_path
     target = @path + params[:name]
-    if params[:commit] == "Create new directory"
-      if !params[:name].empty?
-        target.mkdir
-      end
-    elsif params[:commit] == "Delete this directory"
-      if target.exist? && target.children.length == 0
-        target.rmdir
-      end
-      redirect_to :action => :main, :path => Pathname.new(params[:path]).parent.to_s
-      return;
+    if !params[:name].empty?
+      target.mkdir
     end
     redirect_to :action => :main, :path => params[:path].to_s
+  end
+  
+  def delete_directory
+    @root = root
+    @path = secure_path
+    target = @path
+
+    if target.exist? && target.children.length == 0
+      target.rmdir
+    end
+    redirect_to :action => :main, :path => Pathname.new(params[:path]).parent.to_s
   end
   
   def new
