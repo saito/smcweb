@@ -18,10 +18,4 @@ module EditorHelper
     return render(:partial => name)
   end
 
-  def get_content(file, name)
-    loader = SmallCage::Loader.new(file)
-    result = loader.load(file)
-    return result[name];
-  end
-
 end

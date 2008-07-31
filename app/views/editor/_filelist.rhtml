@@ -9,50 +9,57 @@
 
   <% form_tag({:action => "delete_multiple"}) do %>
   <table border="0">
-  <% @files.reverse.each do |f| %>
+  <% @files.reverse[0..(local_conf["max"].nil? ? -1 : local_conf["max"].to_i)].each do |f| %>
   <tr>
 
     <td valign="top"><%= check_box_tag "targets[]", controller.relpath(f) %></td>
 
     <td style="text-align:top; padding-bottom:6px;">
     <a href="<%= @config["uri_prefix"] %>/editor/index?target=<%= controller.relpath(f) %>">
-	<% if local_conf["labels"].nil? %>
+	<%- if local_conf["labels"].nil? -%>
 	  <%=h f.basename %>
-	<% else %>
-	  <% local_conf["labels"].each do |label| %>
-	    <% if label.is_a?(Symbol) && label.to_s =~ /^path_(\d+)$/ %>
+	<%- else -%>
+	  <%
+	  data = {}
+	  local_conf["labels"].each do |label| %>
+	    <%- if label.is_a?(Symbol) && label.to_s =~ /^path_(\d+)$/ -%>
 	      <%= @path.path_to_args(f)[$1.to_i] %>
-	    <% else %>
-  	      <%= get_content(f, label) %> 
-        <% end %>
-      <% end %>
-	<% end %>
+	    <%- else -%>
+	      <% data = Smcweb::Utils.loadsmc(f) if data.empty? %>
+  	      <%= data[label] %> 
+        <%- end -%>
+      <%- end -%>
+	<%- end -%>
     </a>
     </td>
 
   </tr>
-  <% end %>
+  <%- end -%>
   </table>
   <%= submit_tag "削除", :onclick => "return #{confirm_javascript_function("チェックした項目を削除します。よろしいですか？") }" %>
-  <% end %>
-
-<% else %>
-
-  <% @files.reverse.each do |f| %>
+  <%- end -%>
+<%- else -%>
+<!-- 0.. -->
+  <%- @files.reverse[0..(local_conf["max"].nil? ? -1 : local_conf["max"].to_i)].each do |f| -%>
   <div style="margin-bottom:6px;">
     <a href="<%= @config["uri_prefix"] %>/editor/index?target=<%=h f.basename %>">
-	<% if local_conf["labels"].nil? %>
+	<%- if local_conf["labels"].nil? -%>
 	  <%=h f.basename %>
-	<% else %>
-	   <% local_conf["labels"].each do |label| %>
-	   <%= get_content(f, label) %> 
-	   <% end %>
-	<% end %>
+	<%- else -%>
+	   <% data = {}
+	   local_conf["labels"].each do |label| %>
+	     <%- if label.is_a?(Symbol) && label.to_s =~ /^path_(\d+)$/ -%>
+	       <%= @path.path_to_args(f)[$1.to_i] %>
+         <%- else -%>
+	       <% data = Smcweb::Utils.loadsmc(f) if data.empty? %>
+  	       <%= data[label] %> 
+         <%- end -%>
+	   <%- end -%>
+	<%- end -%>
     </a>
   </div>
-  <% end %>
+  <%- end -%>
 
-<% end %>
+<%- end -%>
 
-
-<% end %>
+<%- end -%>

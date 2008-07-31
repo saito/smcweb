@@ -5,11 +5,6 @@ class EditorController < ApplicationController
   attr_reader :config
   layout "default"
   
-  def test
-    p @path.new_path
-    render :text => "OK"
-  end
-
   def index
     init_target(true)
     init_fields
