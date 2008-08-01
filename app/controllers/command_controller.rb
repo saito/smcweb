@@ -20,8 +20,13 @@ class CommandController < ApplicationController
       command = config["config_dir"] + "/" + cdata["command"]
     end
     
-    open("| #{command}") do |io|
-      @result += io.read
+    begin    
+      open("| #{command}") do |io|
+        @result += io.read
+      end
+    rescue => ex
+      logger.error(ex)
+      @result = ex.to_s
     end
     
     @command = command
