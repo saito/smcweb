@@ -8,7 +8,11 @@ class BrowserController < ApplicationController
   require 'smallcage'
 
   def project_index
-    redirect_to :action => "index"
+    files = nil
+    Dir.chdir(@config["site_config_dir"]) do
+      files = Dir.glob( "*.yml")
+    end
+    @editors = files.map {|name| name[0..-5] }
   end
 
   def index

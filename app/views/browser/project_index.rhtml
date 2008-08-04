@@ -1,0 +1,16 @@
+<html>
+<head>
+<title>smcweb - <%=h params[:site] %> admin's home</title>
+</head>
+<body>
+<ul>
+
+<li><a href="./browser/">Browser</a></li>
+
+<%- @editors.to_a.each do |e| -%>
+<li><a href="./<%= e %>/editor/index"><%= e %></a></li>
+<%- end -%>
+
+</ul>
+</body>
+</html>
