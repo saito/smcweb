@@ -7,6 +7,9 @@ class BrowserController < ApplicationController
   require 'pathname'
   require 'smallcage'
 
+  def project_index
+    redirect_to :action => "index"
+  end
 
   def index
     @root = root
