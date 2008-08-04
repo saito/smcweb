@@ -23,4 +23,6 @@ ActionController::Routing::Routes.draw do |map|
   map.connect ':site/browser/:action', :controller => 'browser'
 
   map.connect ':site/:type/:controller/:action/:id'
+  
+  map.connect ':site', :controller => 'browser', :action => 'project_index'
 end
