@@ -54,7 +54,18 @@ module Smcweb
     end
   
     def path_to_args(path)
-      match = path.to_s.match(/#{@pattern}/)
+      path = path.to_s
+      if path =~ %r{(?:^|/)\.\.?(?:/|$)}
+        return nil
+      end
+      
+      rootstr = @target_root.realpath.to_s
+      if path.index(rootstr) != 0
+        return nil
+      end
+      path = path[rootstr.length .. -1]
+      
+      match = path.match(/#{@pattern}/)
       return nil unless match
       result = match.to_a
       result.shift
