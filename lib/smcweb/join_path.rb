@@ -49,7 +49,7 @@ module Smcweb
       if fname =~ %r{(?:^|/)\.\.?(?:/|$)}
         return nil
       end
-      
+
       return @target_root + fname
     end
   
@@ -64,6 +64,9 @@ module Smcweb
         return nil
       end
       path = path[rootstr.length .. -1]
+      if path[0] == ?/
+        path = path[1..-1]
+      end
       
       match = path.match(/#{@pattern}/)
       return nil unless match
