@@ -40,7 +40,7 @@ module Smcweb
         end
       end
     
-      return result
+      return result.sort
     end
     
     def args_to_path(args)
